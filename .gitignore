@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Created by https://www.toptal.com/developers/gitignore/api/firebase,java,android,androidstudio,intellij,kotlin,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=firebase,java,android,androidstudio,intellij,kotlin,gradle
 
@@ -161,10 +162,16 @@ fabric.properties
 .idea/codestream.xml
 
 ### Java ###
+=======
+>>>>>>> de6783eec47888a57401d49fd41e3e98d89b671a
 # Compiled class file
 *.class
 
 # Log file
+<<<<<<< HEAD
+=======
+*.log
+>>>>>>> de6783eec47888a57401d49fd41e3e98d89b671a
 
 # BlueJ files
 *.ctxt
@@ -183,6 +190,7 @@ fabric.properties
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+<<<<<<< HEAD
 replay_pid*
 
 ### Kotlin ###
@@ -328,3 +336,5 @@ obj/
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/firebase,java,android,androidstudio,intellij,kotlin,gradle
+=======
+>>>>>>> de6783eec47888a57401d49fd41e3e98d89b671a
