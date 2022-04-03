@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Pairing code">
+        <Preference
+            android:icon="@drawable/ic_fluent_password_24_regular"
+            android:key="PairingKey"
+            android:title="Edit Pairing key"
+            android:summary="Pairing is allowed only between devices using the same pairing key." />
+        <ListPreference
+            android:key="uniqueIdMethod"
+            android:defaultValue="Globally-Unique ID"
+            android:title="Select method to get device identifiers"
+            android:summary="Choose how to get the unique ID needed to identify your device."
+            android:entries="@array/uniqueIdMethod_description"
+            android:entryValues="@array/uniqueIdMethod"
+            android:icon="@drawable/ic_fluent_fingerprint_24_regular"/>
+        <Preference
+            android:icon="@drawable/ic_info_outline_black_24dp"
+            android:key="EncryptionInfo"
+            android:summary="Changing these options requires re-pairing on all paired devices." />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Find my device">
+        <Preference
+            android:key="findPhone"
+            android:summary="Play loud sound on other devices to find"
+            android:title="Execute Find my devices"
+            android:icon="@drawable/ic_fluent_screen_search_24_regular"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="NotReceiveFindDevice"
+            android:title="Do not receive Find request"
+            android:summary="Ignores Find my devices request on this device"
+            android:icon="@drawable/ic_fluent_share_screen_stop_24_regular"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Tasker Plug-in">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="UseTaskerExtension"
+            android:title="Enable Tasker Plugin"
+            android:summary="Activate the Tasker extension plugin"
+            android:icon="@drawable/ic_fluent_star_settings_24_regular"/>
+        <Preference
+            android:key="TaskerCompatibleInfo"
+            android:summary="Show list of Tasker compatible apps"
+            android:icon="@drawable/ic_info_outline_black_24dp"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Data Encryption">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_fluent_lock_shield_24_regular"
+            android:key="UseDataEncryption"
+            android:summary="Encrypt your notification data using AES algorithm"
+            android:title="Encrypt sending data" />
+        <Preference
+            android:key="UseDataEncryptionPassword"
+            android:summary="Password to use for AES encryption"
+            android:title="Password for encryption" />
+        <Preference
+            android:icon="@drawable/ic_info_outline_black_24dp"
+            android:key="EncryptionInfo"
+            android:summary="Passwords must be the same on all devices sending and receiving data" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Others">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="allowAcceptPairAutomatically"
+            android:summary="WARNING: May be paired automatically without user permission"
+            android:title="Accept pairing without confirm"
+            android:icon="@drawable/ic_fluent_arrow_sync_checkmark_24_regular" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="showAlreadyConnected"
+            android:summary="Display already connected devices in the search list"
+            android:title="Search already connected devices"
+            android:icon="@drawable/ic_fluent_plug_disconnected_24_regular" />
+        <SwitchPreference
+            android:key="UseToastInstead"
+            android:defaultValue="false"
+            android:title="Use Toast instead of Snackbar"
+            android:summary="Using Toast to display messages such as warnings within the app"
+            android:icon="@drawable/ic_fluent_channel_alert_24_regular"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="printDebugLog"
+            android:summary="Output debug information about pairing to Logcat"
+            android:title="Print debug log"
+            android:icon="@drawable/ic_fluent_bug_24_regular" />
+    </PreferenceCategory>
+</PreferenceScreen>

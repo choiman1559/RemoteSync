@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Sync Protocol</string>
+    <string name="title_activity_settings">Sync Protocol</string>
+
+    <string name="global_cancel">Cancel</string>
+    <string name="notify_channel_id">PairSync</string>
+    <string name="notify_channel_name">Pair Sync</string>
+    <string name="notify_channel_description">Pair various android devices</string>
+    <string name="Start_Activity_Completed">Completed</string>
+    <string name="Dialog_Tasker_compatible">Plugins are available in the apps shown below.\n\n - Tasker\n(net.dinglisch.android.taskerm)\n\n - Automate\n(com.llamalab.automate)\n\n - Locale X\n(com.twofortyfouram.locale.x)\n\n - MacroDroid\n(com.arlosoft.macrodroid)</string>
+</resources>
