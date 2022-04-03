@@ -56,6 +56,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <com.kieronquinn.monetcompat.view.MonetSwitch
+                android:id="@+id/PairingSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:transitionName="Pairing "
+                android:outlineProvider="none"
+                android:elevation="8dp"
+                android:text="Use Pairing" />
+
             <LinearLayout
                 android:id="@+id/addNewDevice"
                 android:layout_width="match_parent"
@@ -65,6 +75,7 @@
                 android:focusable="true"
                 android:orientation="horizontal"
                 android:paddingVertical="15dp"
+                android:layout_marginTop="24dp"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView

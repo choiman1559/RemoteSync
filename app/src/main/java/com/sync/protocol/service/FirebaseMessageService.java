@@ -71,25 +71,26 @@ public class FirebaseMessageService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         manager.acquire();
-
         if(BuildConfig.DEBUG) Log.d(remoteMessage.getMessageId(), remoteMessage.toString());
-        Map<String,String> map = remoteMessage.getData();
 
-        String rawPassword = prefs.getString("EncryptionPassword", "");
-        if("true".equals(map.get("encrypted"))) {
-            if(prefs.getBoolean("UseDataEncryption", false) && !rawPassword.equals("")) {
-                try {
-                    JSONObject object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), rawPassword));
-                    Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
-                    processReception(newMap, this);
-                } catch (GeneralSecurityException e) {
-                    Handler mHandler = new Handler(Looper.getMainLooper());
-                    mHandler.postDelayed(() -> Toast.makeText(this, "Error occurred while decrypting data!\nPlease check password and try again!", Toast.LENGTH_SHORT).show(), 0);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if(prefs.getBoolean("ServiceToggle", false)) {
+            Map<String, String> map = remoteMessage.getData();
+            String rawPassword = prefs.getString("EncryptionPassword", "");
+            if ("true".equals(map.get("encrypted"))) {
+                if (prefs.getBoolean("UseDataEncryption", false) && !rawPassword.equals("")) {
+                    try {
+                        JSONObject object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), rawPassword));
+                        Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
+                        processReception(newMap, this);
+                    } catch (GeneralSecurityException e) {
+                        Handler mHandler = new Handler(Looper.getMainLooper());
+                        mHandler.postDelayed(() -> Toast.makeText(this, "Error occurred while decrypting data!\nPlease check password and try again!", Toast.LENGTH_SHORT).show(), 0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        } else processReception(map, this);
+            } else processReception(map, this);
+        }
     }
 
     private void processReception(Map<String, String> map, Context context) {

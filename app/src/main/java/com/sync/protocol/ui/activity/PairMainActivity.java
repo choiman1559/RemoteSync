@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -17,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.kieronquinn.monetcompat.app.MonetCompatActivity;
+import com.kieronquinn.monetcompat.view.MonetSwitch;
 import com.sync.protocol.R;
 import com.sync.protocol.ui.OptionActivity;
 import com.sync.protocol.ui.RequestActionActivity;
@@ -26,8 +29,9 @@ import java.util.Random;
 import java.util.Set;
 
 @SuppressLint("SetTextI18n")
-public class PairMainActivity extends AppCompatActivity {
+public class PairMainActivity extends MonetCompatActivity {
 
+    SharedPreferences prefs;
     SharedPreferences pairPrefs;
     LinearLayout deviceListLayout;
 
@@ -39,8 +43,10 @@ public class PairMainActivity extends AppCompatActivity {
         LinearLayout addNewDevice = findViewById(R.id.addNewDevice);
         LinearLayout connectionPreference = findViewById(R.id.connectionPreference);
         TextView deviceNameInfo = findViewById(R.id.deviceNameInfo);
+        MonetSwitch PairingSwitch = findViewById(R.id.PairingSwitch);
         deviceListLayout = findViewById(R.id.deviceListLayout);
         pairPrefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
+        prefs = getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE);
 
         deviceNameInfo.setText("Visible as \"" + Build.MODEL + "\" to other devices");
         addNewDevice.setOnClickListener(v -> startActivity(new Intent(this, PairingActivity.class)));
@@ -48,6 +54,9 @@ public class PairMainActivity extends AppCompatActivity {
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener((v) -> this.finish());
+
+        PairingSwitch.setChecked(prefs.getBoolean("ServiceToggle", false));
+        PairingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.edit().putBoolean("ServiceToggle", isChecked).apply());
 
         loadDeviceList();
         pairPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {

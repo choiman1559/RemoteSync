@@ -54,7 +54,7 @@
             android:defaultValue="false"
             android:icon="@drawable/ic_fluent_lock_shield_24_regular"
             android:key="UseDataEncryption"
-            android:summary="Encrypt your notification data using AES algorithm"
+            android:summary="Encrypt your data using Military-Grade AES algorithm"
             android:title="Encrypt sending data" />
         <Preference
             android:key="UseDataEncryptionPassword"

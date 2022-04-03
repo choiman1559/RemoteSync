@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+
 android {
     compileSdk 31
     compileOptions {
@@ -13,8 +14,8 @@ android {
         applicationId "com.sync.protocol"
         minSdk 21
         targetSdk 31
-        versionCode 1000101
-        versionName "0.1.1"
+        versionCode 1000102
+        versionName "0.1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
