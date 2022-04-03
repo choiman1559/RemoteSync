@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.microsoft.design:fluent-system-icons:1.1.164@aar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/c0d243ef8a3040991019eccbe8f46f7e/transformed/fluent-system-icons-1.1.164/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/c0d243ef8a3040991019eccbe8f46f7e/transformed/fluent-system-icons-1.1.164/res" />
+      <root url="file://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/c0d243ef8a3040991019eccbe8f46f7e/transformed/fluent-system-icons-1.1.164/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/modules-2/files-2.1/com.microsoft.design/fluent-system-icons/1.1.164/d330a15d9376b353a904d93bfa566604d56a3800/fluent-system-icons-1.1.164-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

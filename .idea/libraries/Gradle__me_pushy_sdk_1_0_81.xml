@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: me.pushy:sdk:1.0.81">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/modules-2/files-2.1/me.pushy/sdk/1.0.81/8b7c744dba027c593b1eb6726a41f4661e48decb/sdk-1.0.81.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/modules-2/files-2.1/me.pushy/sdk/1.0.81/4ec57a042917fb2117ed9cfa083c9172d2edf4af/sdk-1.0.81-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/modules-2/files-2.1/me.pushy/sdk/1.0.81/4ec57a042917fb2117ed9cfa083c9172d2edf4af/sdk-1.0.81-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

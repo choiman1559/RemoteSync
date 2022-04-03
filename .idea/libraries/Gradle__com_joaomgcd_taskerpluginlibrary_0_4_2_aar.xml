@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.joaomgcd:taskerpluginlibrary:0.4.2@aar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/7a4330e31ce6aee28bb1f586f08a6cf5/transformed/taskerpluginlibrary-0.4.2/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/7a4330e31ce6aee28bb1f586f08a6cf5/transformed/taskerpluginlibrary-0.4.2/res" />
+      <root url="file://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/7a4330e31ce6aee28bb1f586f08a6cf5/transformed/taskerpluginlibrary-0.4.2/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/modules-2/files-2.1/com.joaomgcd/taskerpluginlibrary/0.4.2/29e071777c2955c52d5d5f02a48e25463c221644/taskerpluginlibrary-0.4.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

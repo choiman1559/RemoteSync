@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.android.material:material:1.6.0-beta01@aar">
+    <ANNOTATIONS>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/1289549fd81d7831c730d2ff6b82c4e5/transformed/material-1.6.0-beta01/annotations.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/1289549fd81d7831c730d2ff6b82c4e5/transformed/material-1.6.0-beta01/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/1289549fd81d7831c730d2ff6b82c4e5/transformed/material-1.6.0-beta01/res" />
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/transforms-3/1289549fd81d7831c730d2ff6b82c4e5/transformed/material-1.6.0-beta01/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Notisender-projects/NotiSender/gradle/caches/modules-2/files-2.1/com.google.android.material/material/1.6.0-beta01/faf27c277a3480e0a597ab7afffc8f403613badb/material-1.6.0-beta01-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
