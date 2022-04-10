@@ -46,124 +46,129 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <com.kieronquinn.monetcompat.view.MonetSwitch
+            android:id="@+id/PairingSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
+            android:outlineProvider="none"
+            android:elevation="8dp"
+            android:text="Use Pairing" />
 
-            <com.kieronquinn.monetcompat.view.MonetSwitch
-                android:id="@+id/PairingSwitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:transitionName="Pairing "
-                android:outlineProvider="none"
-                android:elevation="8dp"
-                android:text="Use Pairing" />
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/addNewDevice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="horizontal"
-                android:paddingVertical="15dp"
-                android:layout_marginTop="24dp"
-                tools:ignore="UseCompoundDrawables">
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/addNewDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:paddingVertical="15dp"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="start|center"
+                        android:layout_marginHorizontal="24dp"
+                        app:srcCompat="@drawable/ic_fluent_add_24_regular"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:layout_marginStart="5dp"
+                        android:fontFamily="@font/sans"
+                        android:text="Pair new device"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="30dp"
+                    android:text="Previously connected devices"
+                    android:textColor="@color/ui_accent" />
+
+                <LinearLayout
+                    android:id="@+id/deviceListLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:orientation="vertical"
+                    tools:ignore="UselessLeaf" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="25dp"
+                    android:background="@color/ui_bg_toolbar" />
+
+                <LinearLayout
+                    android:id="@+id/connectionPreference"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    android:paddingVertical="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sans"
+                        android:text="Connection preferences"
+                        android:layout_marginHorizontal="24dp"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:textColor="@color/ui_fg_secondary"
+                        android:layout_marginHorizontal="24dp"
+                        android:text="Find my devices, Debug options" />
+                </LinearLayout>
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="start|center"
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
                     android:layout_marginHorizontal="24dp"
-                    app:srcCompat="@drawable/ic_fluent_add_24_regular"
-                    tools:ignore="ContentDescription" />
+                    android:layout_marginTop="30dp"
+                    android:contentDescription="info icon"
+                    app:srcCompat="@drawable/ic_info_outline_black_24dp" />
 
                 <TextView
+                    android:id="@+id/deviceNameInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="5dp"
-                    android:fontFamily="@font/sans"
-                    android:text="Pair new device"
-                    android:textSize="20sp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="30dp"
-                android:text="Previously connected devices"
-                android:textColor="@color/ui_accent" />
-
-            <LinearLayout
-                android:id="@+id/deviceListLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="vertical"
-                tools:ignore="UselessLeaf" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="25dp"
-                android:background="@color/ui_bg_toolbar" />
-
-            <LinearLayout
-                android:id="@+id/connectionPreference"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:paddingVertical="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/sans"
-                    android:text="Connection preferences"
                     android:layout_marginHorizontal="24dp"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="15dp"
+                    android:fontFamily="@font/sans"
+                    android:text="TextView"
                     android:textColor="@color/ui_fg_secondary"
-                    android:layout_marginHorizontal="24dp"
-                    android:text="Find my devices, Debug options" />
+                    tools:text="Visible as 'Pixel 6 Pro' to other devices" />
             </LinearLayout>
-
-            <ImageView
-                android:layout_width="23dp"
-                android:layout_height="23dp"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="30dp"
-                android:contentDescription="info icon"
-                app:srcCompat="@drawable/ic_info_outline_black_24dp" />
-
-            <TextView
-                android:id="@+id/deviceNameInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="15dp"
-                android:fontFamily="@font/sans"
-                android:text="TextView"
-                android:textColor="@color/ui_fg_secondary"
-                tools:text="Visible as 'Pixel 6 Pro' to other devices" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -8,14 +8,12 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.kieronquinn.monetcompat.app.MonetCompatActivity;
@@ -61,7 +59,6 @@ public class PairMainActivity extends MonetCompatActivity {
         loadDeviceList();
         pairPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
             if(key.equals("paired_list")) {
-                deviceListLayout.removeViews(0, deviceListLayout.getChildCount());
                 PairMainActivity.this.runOnUiThread(this::loadDeviceList);
             }
         });
@@ -69,6 +66,9 @@ public class PairMainActivity extends MonetCompatActivity {
 
     void loadDeviceList() {
         Set<String> list = pairPrefs.getStringSet("paired_list", new HashSet<>());
+        if(list.size() == deviceListLayout.getChildCount()) return;
+        deviceListLayout.removeViews(0, deviceListLayout.getChildCount());
+
         for(String string : list) {
             String[] data = string.split("\\|");
             RelativeLayout layout = (RelativeLayout) View.inflate(PairMainActivity.this, R.layout.cardview_pair_device_setting, null);
