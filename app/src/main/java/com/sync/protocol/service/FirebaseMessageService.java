@@ -1,7 +1,5 @@
 package com.sync.protocol.service;
 
-import static com.sync.protocol.Application.pairingProcessList;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -17,35 +15,28 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
 import com.sync.protocol.Application;
 import com.sync.protocol.BuildConfig;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.DataProcess;
-import com.sync.protocol.service.pair.PairDeviceInfo;
-import com.sync.protocol.service.pair.PairDeviceStatus;
-import com.sync.protocol.service.pair.PairListener;
-import com.sync.protocol.service.pair.PairingUtils;
+import com.sync.protocol.service.pair.*;
 import com.sync.protocol.utils.AESCrypto;
 import com.sync.protocol.utils.CompressStringUtil;
 import com.sync.protocol.utils.DataUtils;
 import com.sync.protocol.utils.PowerUtils;
-
+import me.pushy.sdk.lib.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Map;
 
-import me.pushy.sdk.lib.jackson.databind.ObjectMapper;
+import static com.sync.protocol.Application.pairingProcessList;
 
 public class FirebaseMessageService extends FirebaseMessagingService {
     SharedPreferences prefs;
@@ -53,8 +44,8 @@ public class FirebaseMessageService extends FirebaseMessagingService {
     private static PowerUtils manager;
     public static volatile Ringtone lastPlayedRingtone;
     public static final Thread ringtonePlayedThread = new Thread(() -> {
-        while(true) {
-            if(lastPlayedRingtone != null && !lastPlayedRingtone.isPlaying()) lastPlayedRingtone.play();
+        while (true) {
+            if (lastPlayedRingtone != null && !lastPlayedRingtone.isPlaying()) lastPlayedRingtone.play();
         }
     });
 
@@ -71,9 +62,9 @@ public class FirebaseMessageService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         manager.acquire();
-        if(BuildConfig.DEBUG) Log.d(remoteMessage.getMessageId(), remoteMessage.toString());
+        if (BuildConfig.DEBUG) Log.d(remoteMessage.getMessageId(), remoteMessage.toString());
 
-        if(prefs.getBoolean("ServiceToggle", false)) {
+        if (prefs.getBoolean("ServiceToggle", false)) {
             Map<String, String> map = remoteMessage.getData();
             String rawPassword = prefs.getString("EncryptionPassword", "");
             if ("true".equals(map.get("encrypted"))) {
@@ -95,13 +86,13 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
     private void processReception(Map<String, String> map, Context context) {
         String type = map.get("type");
-        if(type != null && !prefs.getString("UID", "").equals("")) {
-            if(type.startsWith("pair") && !isDeviceItself(map)) {
-                switch(type) {
+        if (type != null && !prefs.getString("UID", "").equals("")) {
+            if (type.startsWith("pair") && !isDeviceItself(map)) {
+                switch (type) {
                     case "pair|request_device_list":
                         //Target Device action
                         //Have to Send this device info Data Now
-                        if(!isPairedDevice(map) || prefs.getBoolean("showAlreadyConnected", false)) {
+                        if (!isPairedDevice(map) || prefs.getBoolean("showAlreadyConnected", false)) {
                             pairingProcessList.add(new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing));
                             Application.isListeningToPair = true;
                             PairingUtils.responseDeviceInfoToFinder(map, context);
@@ -111,7 +102,7 @@ public class FirebaseMessageService extends FirebaseMessagingService {
                     case "pair|response_device_list":
                         //Request Device Action
                         //Show device list here; give choice to user which device to pair
-                        if(Application.isFindingDeviceToPair && (!isPairedDevice(map) || prefs.getBoolean("showAlreadyConnected", false))) {
+                        if (Application.isFindingDeviceToPair && (!isPairedDevice(map) || prefs.getBoolean("showAlreadyConnected", false))) {
                             pairingProcessList.add(new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing));
                             PairingUtils.onReceiveDeviceInfo(map);
                         }
@@ -120,9 +111,9 @@ public class FirebaseMessageService extends FirebaseMessagingService {
                     case "pair|request_pair":
                         //Target Device action
                         //Show choice notification (or activity) to user whether user wants to pair this device with another one or not
-                        if(Application.isListeningToPair && isTargetDevice(map)) {
-                            for(PairDeviceInfo info : pairingProcessList) {
-                                if(info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
+                        if (Application.isListeningToPair && isTargetDevice(map)) {
+                            for (PairDeviceInfo info : pairingProcessList) {
+                                if (info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
                                     PairingUtils.showPairChoiceAction(map, context);
                                     break;
                                 }
@@ -133,8 +124,8 @@ public class FirebaseMessageService extends FirebaseMessagingService {
                     case "pair|accept_pair":
                         //Request Device Action
                         //Check if target accepted to pair and process result here
-                        if(Application.isFindingDeviceToPair && isTargetDevice(map)) {
-                            for(PairDeviceInfo info : pairingProcessList) {
+                        if (Application.isFindingDeviceToPair && isTargetDevice(map)) {
+                            for (PairDeviceInfo info : pairingProcessList) {
                                 if (info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
                                     PairingUtils.checkPairResultAndRegister(map, info, context);
                                     break;
@@ -145,27 +136,27 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
                     case "pair|request_data":
                         //process request normal data here sent by paired device(s).
-                        if(isTargetDevice(map) && isPairedDevice(map)) {
+                        if (isTargetDevice(map) && isPairedDevice(map)) {
                             DataProcess.onDataRequested(map, context);
                         }
                         break;
 
                     case "pair|receive_data":
                         //process received normal data here sent by paired device(s).
-                        if(isTargetDevice(map) && isPairedDevice(map)) {
+                        if (isTargetDevice(map) && isPairedDevice(map)) {
                             PairListener.callOnDataReceived(map);
                         }
                         break;
 
                     case "pair|request_action":
                         //process received action data here sent by paired device(s).
-                        if(isTargetDevice(map) && isPairedDevice(map)) {
+                        if (isTargetDevice(map) && isPairedDevice(map)) {
                             DataProcess.onActionRequested(map, context);
                         }
                         break;
 
                     case "pair|find":
-                        if(isTargetDevice(map) && isPairedDevice(map) && !prefs.getBoolean("NotReceiveFindDevice", false)) {
+                        if (isTargetDevice(map) && isPairedDevice(map) && !prefs.getBoolean("NotReceiveFindDevice", false)) {
                             sendFindTaskNotification();
                         }
                         break;
@@ -178,7 +169,7 @@ public class FirebaseMessageService extends FirebaseMessagingService {
         String Device_name = map.get("device_name");
         String Device_id = map.get("device_id");
 
-        if(Device_id == null || Device_name == null) {
+        if (Device_id == null || Device_name == null) {
             Device_id = map.get("send_device_id");
             Device_name = map.get("send_device_name");
         }
@@ -201,8 +192,8 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
     protected boolean isPairedDevice(Map<String, String> map) {
         String dataToFind = map.get("device_name") + "|" + map.get("device_id");
-        for(String str : pairPrefs.getStringSet("paired_list", new HashSet<>())) {
-            if(str.equals(dataToFind)) return true;
+        for (String str : pairPrefs.getStringSet("paired_list", new HashSet<>())) {
+            if (str.equals(dataToFind)) return true;
         }
         return false;
     }
@@ -239,13 +230,13 @@ public class FirebaseMessageService extends FirebaseMessagingService {
         final int findDeviceNotificationId = -2;
         notificationManager.notify(findDeviceNotificationId, builder.build());
 
-        AudioManager audioManager = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(AudioManager.MODE_IN_CALL);
         audioManager.setSpeakerphoneOn(true);
 
-        if(lastPlayedRingtone != null && lastPlayedRingtone.isPlaying()) lastPlayedRingtone.stop();
+        if (lastPlayedRingtone != null && lastPlayedRingtone.isPlaying()) lastPlayedRingtone.stop();
         lastPlayedRingtone = RingtoneManager.getRingtone(this, RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE));
-        if(Build.VERSION.SDK_INT >= 28) {
+        if (Build.VERSION.SDK_INT >= 28) {
             AudioAttributes.Builder audioAttributes = new AudioAttributes.Builder();
             audioAttributes.setUsage(AudioAttributes.USAGE_ALARM);
             audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC);

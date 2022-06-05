@@ -33,6 +33,12 @@ public class PairMainActivity extends MonetCompatActivity {
     SharedPreferences pairPrefs;
     LinearLayout deviceListLayout;
 
+    SharedPreferences.OnSharedPreferenceChangeListener onChange = ((sharedPreferences, key) -> {
+        if(key.equals("paired_list")) {
+            PairMainActivity.this.runOnUiThread(this::loadDeviceList);
+        }
+    });
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,11 +63,7 @@ public class PairMainActivity extends MonetCompatActivity {
         PairingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.edit().putBoolean("ServiceToggle", isChecked).apply());
 
         loadDeviceList();
-        pairPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
-            if(key.equals("paired_list")) {
-                PairMainActivity.this.runOnUiThread(this::loadDeviceList);
-            }
-        });
+        pairPrefs.registerOnSharedPreferenceChangeListener(onChange);
     }
 
     void loadDeviceList() {

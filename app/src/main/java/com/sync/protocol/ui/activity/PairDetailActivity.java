@@ -17,8 +17,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.view.ContextThemeWrapper;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.sync.protocol.R;
 import com.sync.protocol.service.pair.DataProcess;
 import com.sync.protocol.service.pair.PairListener;
@@ -34,6 +36,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PairDetailActivity extends AppCompatActivity {
 
@@ -58,6 +61,7 @@ public class PairDetailActivity extends AppCompatActivity {
 
         LinearLayout batterySaveEnabled = findViewById(R.id.batterySaveEnabled);
         LinearLayout batteryLayout = findViewById(R.id.batteryLayout);
+        LinearLayout testSpeedLayout = findViewById(R.id.testSpeedLayout);
 
         String[] colorLow = getResources().getStringArray(R.array.material_color_low);
         String[] colorHigh = getResources().getStringArray(R.array.material_color_high);
@@ -128,6 +132,31 @@ public class PairDetailActivity extends AppCompatActivity {
                     batteryLayout.setVisibility(View.VISIBLE);
                     batteryDetail.setText(data[0] + "% remaining" + (data[1].equals("true") ? ", Charging" : ""));
                     batteryIcon.setImageDrawable(AppCompatResources.getDrawable(PairDetailActivity.this, finalResId));
+                });
+            }
+        });
+
+        AtomicLong currentTime = new AtomicLong();
+        testSpeedLayout.setVisibility(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("printDebugLog", false) ? View.VISIBLE : View.GONE);
+        testSpeedLayout.setOnClickListener((v) -> {
+            currentTime.set(Calendar.getInstance().getTimeInMillis());
+            DataProcess.requestData(this, Device_name, Device_id, "speed_test");
+        });
+
+        PairListener.addOnDataReceivedListener(map -> {
+            if(Objects.equals(map.get("request_data"), "speed_test") &&
+                    Objects.equals(map.get("device_name"), Device_name) &&
+                    Objects.equals(map.get("device_id"), Device_id)) {
+                final long receivedTime = Long.parseLong(Objects.requireNonNull(map.get("receive_data")));
+                final long arrivalTime = Calendar.getInstance().getTimeInMillis();
+
+                PairDetailActivity.this.runOnUiThread(() -> {
+                    MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(new ContextThemeWrapper(PairDetailActivity.this, R.style.MaterialAlertDialog_Material3));
+                    dialog.setTitle("Test result");
+                    dialog.setMessage("Send -> Receive: " + (receivedTime - currentTime.get()) + "\nReceive -> Send: " + (arrivalTime - receivedTime) + "\nTotal: " + (arrivalTime - currentTime.get()));
+                    dialog.setIcon(R.drawable.ic_info_outline_black_24dp);
+                    dialog.setPositiveButton("Close", (d, w) -> {});
+                    dialog.show();
                 });
             }
         });

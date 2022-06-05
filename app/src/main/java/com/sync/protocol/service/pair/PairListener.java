@@ -7,7 +7,6 @@ final public class PairListener {
     public static onDeviceFoundListener m_onDeviceFoundListener;
     public static onDevicePairResultListener m_onDevicePairResultListener;
     public static ArrayList<onDataReceivedListener> m_onDataReceivedListener = new ArrayList<>();
-    private static PairListener m_obj;
 
     public interface onDeviceFoundListener {
         void onReceive(Map<String, String> map);
@@ -33,18 +32,15 @@ final public class PairListener {
         if(!m_onDataReceivedListener.contains(mOnDataReceivedListener)) m_onDataReceivedListener.add(mOnDataReceivedListener);
     }
 
+    public static void removeOnDataReceivedListener(int index) {
+
+    }
+
     public static void callOnDataReceived(Map<String, String> map) {
         if(m_onDataReceivedListener != null) {
             for (onDataReceivedListener listener : m_onDataReceivedListener) {
                 listener.onReceive(map);
             }
         }
-    }
-
-    public static PairListener model() {
-        if (m_obj == null) {
-            m_obj = new PairListener();
-        }
-        return m_obj;
     }
 }

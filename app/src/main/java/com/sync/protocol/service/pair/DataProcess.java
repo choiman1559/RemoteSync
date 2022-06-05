@@ -129,7 +129,8 @@ public class DataProcess {
                     dataToSend = batteryPct + "|" + isCharging + "|" + isBatterySaver;
                     break;
 
-                case "":
+                case "speed_test":
+                    dataToSend = Long.toString(Calendar.getInstance().getTimeInMillis());
                     break;
             }
         }
