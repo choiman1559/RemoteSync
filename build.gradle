@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
     repositories {
         google()
         mavenCentral()
@@ -10,10 +9,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
-        classpath 'com.google.gms:google-services:4.3.10'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.google.gms:google-services:4.3.13'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -26,6 +25,17 @@ allprojects {
         //noinspection JcenterRepositoryObsolete
         jcenter()
         maven { url "https://jitpack.io" }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Choiman1559/RemoteSync")
+            credentials {
+                def githubProperties = new Properties()
+                githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+                username = githubProperties["gpr.user"] ?: System.getenv("GITHUB_USERNAME")
+                password = githubProperties["gpr.key"] ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

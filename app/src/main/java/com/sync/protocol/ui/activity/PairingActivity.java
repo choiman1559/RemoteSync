@@ -16,11 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.data.PairDeviceStatus;
+import com.sync.lib.action.PairListener;
+import com.sync.lib.process.Process;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.PairDeviceInfo;
-import com.sync.protocol.service.pair.PairDeviceStatus;
-import com.sync.protocol.service.pair.PairListener;
-import com.sync.protocol.service.pair.PairingUtils;
 import com.sync.protocol.utils.DataUtils;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class PairingActivity extends AppCompatActivity {
             }
         });
 
-        PairingUtils.requestDeviceListWidely(this);
+        Process.requestDeviceListWidely(this);
         deviceName.setText(Build.MODEL);
         deviceId.setText("Phone's Unique address: " + DataUtils.getUniqueID(this));
 
@@ -100,7 +100,7 @@ public class PairingActivity extends AppCompatActivity {
         holder.icon.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(colorLow[randomIndex])));
 
         layout.setOnClickListener(v -> {
-            PairingUtils.requestPair(Device_name, Device_id, PairingActivity.this);
+            Process.requestPair(Device_name, Device_id, PairingActivity.this);
             progress.setVisibility(View.GONE);
 
             holder.pairStatus.setText("Connecting...");

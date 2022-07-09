@@ -12,9 +12,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.DataProcess;
-import com.sync.protocol.ui.ToastHelper;
 
 import java.util.Objects;
 
@@ -88,11 +87,11 @@ public class RequestActionActivity extends AppCompatActivity {
                 taskArgs1.setError("Please type argument");
             } else {
                 if (taskArgs0.getVisibility() == View.VISIBLE && taskArgs1.getVisibility() == View.VISIBLE) {
-                    DataProcess.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
+                    DataUtils.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
                 } else if (taskArgs0.getVisibility() == View.VISIBLE) {
-                    DataProcess.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
+                    DataUtils.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
                 } else {
-                    DataProcess.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString());
+                    DataUtils.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString());
                 }
 
                 ToastHelper.show(this, "Your request is posted!", "OK", ToastHelper.LENGTH_SHORT);

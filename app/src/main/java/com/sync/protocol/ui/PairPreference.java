@@ -23,8 +23,10 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kieronquinn.monetcompat.core.MonetCompat;
+import com.sync.lib.Protocol;
+import com.sync.lib.data.ConnectionOption;
 import com.sync.protocol.R;
-import com.sync.protocol.utils.DataUtils;
+import com.sync.lib.util.DataUtils;
 
 public class PairPreference extends PreferenceFragmentCompat  {
 
@@ -71,6 +73,20 @@ public class PairPreference extends PreferenceFragmentCompat  {
             boolean foo = (boolean) newValue;
             UseDataEncryptionPassword.setVisible(foo);
             return true;
+        });
+
+        prefs.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> {
+            ConnectionOption option = new ConnectionOption();
+            option.setPairingKey(prefs.getString("UID", ""));
+            option.setIdentifierValue(com.sync.protocol.utils.DataUtils.getUniqueID(mContext));
+            option.setEncryptionEnabled(prefs.getBoolean("UseDataEncryption", false));
+            option.setEncryptionPassword(prefs.getString("EncryptionPassword", ""));
+            option.setPrintDebugLog(prefs.getBoolean("printDebugLog", false));
+            option.setDenyFindRequest(prefs.getBoolean("NotReceiveFindDevice", false));
+            option.setShowAlreadyConnected(prefs.getBoolean("showAlreadyConnected", false));
+            option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
+
+            Protocol.setConnectionOption(option);
         });
     }
 

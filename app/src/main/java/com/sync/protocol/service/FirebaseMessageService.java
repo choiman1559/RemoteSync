@@ -11,32 +11,20 @@ import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.sync.protocol.Application;
+
+import com.sync.lib.Protocol;
 import com.sync.protocol.BuildConfig;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.*;
-import com.sync.protocol.utils.AESCrypto;
-import com.sync.protocol.utils.CompressStringUtil;
-import com.sync.protocol.utils.DataUtils;
 import com.sync.protocol.utils.PowerUtils;
-import me.pushy.sdk.lib.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
-
-import java.security.GeneralSecurityException;
-import java.util.HashSet;
-import java.util.Map;
-
-import static com.sync.protocol.Application.pairingProcessList;
 
 public class FirebaseMessageService extends FirebaseMessagingService {
     SharedPreferences prefs;
@@ -48,6 +36,7 @@ public class FirebaseMessageService extends FirebaseMessagingService {
             if (lastPlayedRingtone != null && !lastPlayedRingtone.isPlaying()) lastPlayedRingtone.play();
         }
     });
+    static FirebaseMessageService instance;
 
     @Override
     public void onCreate() {
@@ -56,149 +45,24 @@ public class FirebaseMessageService extends FirebaseMessagingService {
         pairPrefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
         manager = PowerUtils.getInstance(this);
         manager.acquire();
+        instance = this;
     }
 
-    @SuppressWarnings("unchecked")
+    public static FirebaseMessageService getInstance() {
+        return instance;
+    }
+
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         manager.acquire();
         if (BuildConfig.DEBUG) Log.d(remoteMessage.getMessageId(), remoteMessage.toString());
 
         if (prefs.getBoolean("ServiceToggle", false)) {
-            Map<String, String> map = remoteMessage.getData();
-            String rawPassword = prefs.getString("EncryptionPassword", "");
-            if ("true".equals(map.get("encrypted"))) {
-                if (prefs.getBoolean("UseDataEncryption", false) && !rawPassword.equals("")) {
-                    try {
-                        JSONObject object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), rawPassword));
-                        Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
-                        processReception(newMap, this);
-                    } catch (GeneralSecurityException e) {
-                        Handler mHandler = new Handler(Looper.getMainLooper());
-                        mHandler.postDelayed(() -> Toast.makeText(this, "Error occurred while decrypting data!\nPlease check password and try again!", Toast.LENGTH_SHORT).show(), 0);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else processReception(map, this);
+            Protocol.onMessageReceived(remoteMessage.getData());
         }
     }
 
-    private void processReception(Map<String, String> map, Context context) {
-        String type = map.get("type");
-        if (type != null && !prefs.getString("UID", "").equals("")) {
-            if (type.startsWith("pair") && !isDeviceItself(map)) {
-                switch (type) {
-                    case "pair|request_device_list":
-                        //Target Device action
-                        //Have to Send this device info Data Now
-                        if (!isPairedDevice(map) || prefs.getBoolean("showAlreadyConnected", false)) {
-                            pairingProcessList.add(new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing));
-                            Application.isListeningToPair = true;
-                            PairingUtils.responseDeviceInfoToFinder(map, context);
-                        }
-                        break;
-
-                    case "pair|response_device_list":
-                        //Request Device Action
-                        //Show device list here; give choice to user which device to pair
-                        if (Application.isFindingDeviceToPair && (!isPairedDevice(map) || prefs.getBoolean("showAlreadyConnected", false))) {
-                            pairingProcessList.add(new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing));
-                            PairingUtils.onReceiveDeviceInfo(map);
-                        }
-                        break;
-
-                    case "pair|request_pair":
-                        //Target Device action
-                        //Show choice notification (or activity) to user whether user wants to pair this device with another one or not
-                        if (Application.isListeningToPair && isTargetDevice(map)) {
-                            for (PairDeviceInfo info : pairingProcessList) {
-                                if (info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
-                                    PairingUtils.showPairChoiceAction(map, context);
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case "pair|accept_pair":
-                        //Request Device Action
-                        //Check if target accepted to pair and process result here
-                        if (Application.isFindingDeviceToPair && isTargetDevice(map)) {
-                            for (PairDeviceInfo info : pairingProcessList) {
-                                if (info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
-                                    PairingUtils.checkPairResultAndRegister(map, info, context);
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case "pair|request_data":
-                        //process request normal data here sent by paired device(s).
-                        if (isTargetDevice(map) && isPairedDevice(map)) {
-                            DataProcess.onDataRequested(map, context);
-                        }
-                        break;
-
-                    case "pair|receive_data":
-                        //process received normal data here sent by paired device(s).
-                        if (isTargetDevice(map) && isPairedDevice(map)) {
-                            PairListener.callOnDataReceived(map);
-                        }
-                        break;
-
-                    case "pair|request_action":
-                        //process received action data here sent by paired device(s).
-                        if (isTargetDevice(map) && isPairedDevice(map)) {
-                            DataProcess.onActionRequested(map, context);
-                        }
-                        break;
-
-                    case "pair|find":
-                        if (isTargetDevice(map) && isPairedDevice(map) && !prefs.getBoolean("NotReceiveFindDevice", false)) {
-                            sendFindTaskNotification();
-                        }
-                        break;
-                }
-            }
-        }
-    }
-
-    protected boolean isDeviceItself(Map<String, String> map) {
-        String Device_name = map.get("device_name");
-        String Device_id = map.get("device_id");
-
-        if (Device_id == null || Device_name == null) {
-            Device_id = map.get("send_device_id");
-            Device_name = map.get("send_device_name");
-        }
-
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = DataUtils.getUniqueID(this);
-
-        return DEVICE_NAME.equals(Device_name) && DEVICE_ID.equals(Device_id);
-    }
-
-    protected boolean isTargetDevice(Map<String, String> map) {
-        String Device_name = map.get("send_device_name");
-        String Device_id = map.get("send_device_id");
-
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = DataUtils.getUniqueID(this);
-
-        return DEVICE_NAME.equals(Device_name) && DEVICE_ID.equals(Device_id);
-    }
-
-    protected boolean isPairedDevice(Map<String, String> map) {
-        String dataToFind = map.get("device_name") + "|" + map.get("device_id");
-        for (String str : pairPrefs.getStringSet("paired_list", new HashSet<>())) {
-            if (str.equals(dataToFind)) return true;
-        }
-        return false;
-    }
-
-    protected void sendFindTaskNotification() {
+    public void sendFindTaskNotification() {
         manager.acquire();
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

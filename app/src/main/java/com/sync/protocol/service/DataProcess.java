@@ -1,9 +1,10 @@
-package com.sync.protocol.service.pair;
+package com.sync.protocol.service;
 
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
@@ -11,7 +12,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -20,7 +23,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -30,14 +32,13 @@ import com.application.isradeleon.notify.Notify;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.sync.protocol.R;
-import com.sync.protocol.service.TaskerPairEventKt;
-import com.sync.protocol.utils.AsyncTask;
-import com.sync.protocol.utils.DataUtils;
-import com.sync.protocol.utils.PowerUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.util.DataUtils;
+import com.sync.protocol.R;
+import com.sync.protocol.ui.activity.PairAcceptActivity;
+import com.sync.protocol.utils.AsyncTask;
+import com.sync.protocol.utils.PowerUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,70 +46,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class DataProcess {
-    public static void requestData(Context context, String Device_name, String Device_id, String dataType) {
-        Date date = Calendar.getInstance().getTime();
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = DataUtils.getUniqueID(context);
-        String TOPIC = "/topics/" + context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "");
-
-        JSONObject notificationHead = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put("type", "pair|request_data");
-            notificationBody.put("device_name", DEVICE_NAME);
-            notificationBody.put("device_id", DEVICE_ID);
-            notificationBody.put("send_device_name", Device_name);
-            notificationBody.put("send_device_id", Device_id);
-            notificationBody.put("request_data", dataType);
-            notificationBody.put("date", date);
-
-            notificationHead.put("to", TOPIC);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
-        } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
-        }
-        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
-    }
-
-    public static void requestAction(Context context, String Device_name, String Device_id, String dataType, String... args) {
-        StringBuilder dataToSend = new StringBuilder();
-        if (args.length > 1) {
-            for (String str : args) {
-                dataToSend.append(str).append("|");
-            }
-            dataToSend.setCharAt(dataToSend.length() - 1, '\0');
-        } else if (args.length == 1) dataToSend.append(args[0]);
-
-        Date date = Calendar.getInstance().getTime();
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = DataUtils.getUniqueID(context);
-        String TOPIC = "/topics/" + context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "");
-
-        JSONObject notificationHead = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put("type", "pair|request_action");
-            notificationBody.put("device_name", DEVICE_NAME);
-            notificationBody.put("device_id", DEVICE_ID);
-            notificationBody.put("send_device_name", Device_name);
-            notificationBody.put("send_device_id", Device_id);
-            notificationBody.put("request_action", dataType);
-            notificationBody.put("date", date);
-            if (args.length > 0) notificationBody.put("action_args", dataToSend.toString());
-
-            notificationHead.put("to", TOPIC);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
-        } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
-        }
-        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
-    }
-
     public static void onDataRequested(Map<String, String> map, Context context) {
         String dataType = map.get("request_data");
         String dataToSend = "";
@@ -135,31 +77,9 @@ public class DataProcess {
             }
         }
 
-        if (dataToSend.isEmpty()) return;
-        Date date = Calendar.getInstance().getTime();
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = DataUtils.getUniqueID(context);
-        String TOPIC = "/topics/" + context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "");
-
-        JSONObject notificationHead = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put("type", "pair|receive_data");
-            notificationBody.put("device_name", DEVICE_NAME);
-            notificationBody.put("device_id", DEVICE_ID);
-            notificationBody.put("send_device_name", map.get("device_name"));
-            notificationBody.put("send_device_id", map.get("device_id"));
-            notificationBody.put("receive_data", dataToSend);
-            notificationBody.put("request_data", dataType);
-            notificationBody.put("date", date);
-
-            notificationHead.put("to", TOPIC);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
-        } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
+        if (!dataToSend.isEmpty()) {
+            DataUtils.responseDataRequest(new PairDeviceInfo(map.get("device_name"), map.get("device_id")), dataType, dataToSend, context);
         }
-        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
     public static void onActionRequested(Map<String, String> map, Context context) {
@@ -358,5 +278,62 @@ public class DataProcess {
                     break;
             }
         }
+    }
+
+    public static void showPairChoiceAction(Map<String, String> map, Context context) {
+        if(context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("allowAcceptPairAutomatically", false)) {
+            PairAcceptActivity.sendAcceptedMessage(map.get("device_name"), map.get("device_id"), true, context);
+            SharedPreferences prefs = context.getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
+            boolean isNotRegistered = true;
+            String dataToSave = map.get("device_name") + "|" + map.get("device_id");
+
+            Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
+            for(String str : list) {
+                if(str.equals(dataToSave)) {
+                    isNotRegistered = false;
+                    break;
+                }
+            }
+
+            if(isNotRegistered) {
+                list.add(dataToSave);
+                prefs.edit().putStringSet("paired_list", list).apply();
+            }
+            return;
+        }
+
+        int uniqueCode = (int) (Calendar.getInstance().getTime().getTime() / 1000L % Integer.MAX_VALUE);
+
+        Intent notificationIntent = new Intent(context, PairAcceptActivity.class);
+        notificationIntent.putExtra("device_name", map.get("device_name"));
+        notificationIntent.putExtra("device_id", map.get("device_id"));
+
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, uniqueCode, notificationIntent, Build.VERSION.SDK_INT > 30 ? PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(R.string.notify_channel_id))
+                .setContentTitle("New pair request incoming!")
+                .setContentText("click here to pair device")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_arrow_sync_checkmark_24_regular))
+                .setGroup(context.getPackageName() + ".NOTIFICATION")
+                .setGroupSummary(true)
+                .setAutoCancel(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setSmallIcon(R.drawable.ic_notification);
+            CharSequence channelName = context.getString(R.string.notify_channel_name);
+            String description = context.getString(R.string.notify_channel_description);
+            NotificationChannel channel = new NotificationChannel(context.getString(R.string.notify_channel_id), channelName, NotificationManager.IMPORTANCE_HIGH);
+
+            channel.setDescription(description);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+        } else builder.setSmallIcon(R.mipmap.ic_notification);
+
+        assert notificationManager != null;
+        notificationManager.notify((int)((new Date().getTime() / 1000L) % Integer.MAX_VALUE), builder.build());
     }
 }

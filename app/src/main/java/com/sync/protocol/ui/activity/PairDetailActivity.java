@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,17 +19,14 @@ import androidx.appcompat.view.ContextThemeWrapper;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.sync.protocol.R;
-import com.sync.protocol.service.pair.DataProcess;
-import com.sync.protocol.service.pair.PairListener;
-import com.sync.protocol.ui.ToastHelper;
-import com.sync.protocol.utils.DataUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sync.lib.action.PairListener;
+import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.util.DataUtils;
+import com.sync.protocol.R;
+import com.sync.protocol.ui.ToastHelper;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
@@ -80,32 +75,11 @@ public class PairDetailActivity extends AppCompatActivity {
         });
 
         findButton.setOnClickListener(v -> {
-            Date date = Calendar.getInstance().getTime();
-            String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-            String DEVICE_ID = DataUtils.getUniqueID(this);
-            String TOPIC = "/topics/" + getSharedPreferences("com.sync.protocol_preferences",MODE_PRIVATE).getString("UID", "");
-
-            JSONObject notificationHead = new JSONObject();
-            JSONObject notificationBody = new JSONObject();
-            try {
-                notificationBody.put("type", "pair|find");
-                notificationBody.put("device_name", DEVICE_NAME);
-                notificationBody.put("device_id", DEVICE_ID);
-                notificationBody.put("send_device_name", Device_name);
-                notificationBody.put("send_device_id", Device_id);
-                notificationBody.put("date", date);
-
-                notificationHead.put("to", TOPIC);
-                notificationHead.put("data", notificationBody);
-            } catch (JSONException e) {
-                Log.e("Noti", "onCreate: " + e.getMessage());
-            }
-
-            DataUtils.sendNotification(notificationHead, getPackageName(), this);
+            DataUtils.sendFindTaskNotification(new PairDeviceInfo(Device_name, Device_id), this);
             ToastHelper.show(this, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
         });
 
-        DataProcess.requestData(this, Device_name, Device_id, "battery_info");
+        com.sync.lib.util.DataUtils.requestData(this, Device_name, Device_id, "battery_info");
         PairListener.addOnDataReceivedListener(map -> {
             if(Objects.equals(map.get("request_data"), "battery_info") &&
                     Objects.equals(map.get("device_name"), Device_name) &&
@@ -140,7 +114,7 @@ public class PairDetailActivity extends AppCompatActivity {
         testSpeedLayout.setVisibility(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("printDebugLog", false) ? View.VISIBLE : View.GONE);
         testSpeedLayout.setOnClickListener((v) -> {
             currentTime.set(Calendar.getInstance().getTimeInMillis());
-            DataProcess.requestData(this, Device_name, Device_id, "speed_test");
+            com.sync.lib.util.DataUtils.requestData(this, Device_name, Device_id, "speed_test");
         });
 
         PairListener.addOnDataReceivedListener(map -> {

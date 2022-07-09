@@ -1,29 +1,22 @@
 package com.sync.protocol.ui.activity;
 
-import static com.sync.protocol.Application.pairingProcessList;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
-import com.sync.protocol.Application;
+import com.sync.lib.Protocol;
+import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.process.Process;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.PairDeviceInfo;
 import com.sync.protocol.ui.ExitActivity;
-import com.sync.protocol.utils.DataUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -67,31 +60,14 @@ public class PairAcceptActivity extends AppCompatActivity {
     }
 
     public static void sendAcceptedMessage(String Device_name, String Device_id, boolean isAccepted, Context context) {
-        String Topic = "/topics/" + context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID","");
-        JSONObject notificationHead = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put("type","pair|accept_pair");
-            notificationBody.put("device_name", Build.MANUFACTURER  + " " + Build.MODEL);
-            notificationBody.put("device_id", DataUtils.getUniqueID(context));
-            notificationBody.put("send_device_name", Device_name);
-            notificationBody.put("send_device_id", Device_id);
-            notificationBody.put("pair_accept", isAccepted);
-            notificationHead.put("to",Topic);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
-        } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage() );
-        }
-
-        DataUtils.sendNotification(notificationHead, "pair.func", context);
+        Process.responsePairAcceptation(new PairDeviceInfo(Device_name, Device_id), isAccepted, context);
         ExitActivity.exitApplication(context);
 
         if(isAccepted) {
-            for(PairDeviceInfo info : pairingProcessList) {
+            for(PairDeviceInfo info : Protocol.pairingProcessList) {
                 if(info.getDevice_name().equals(Device_name) && info.getDevice_id().equals(Device_id)) {
-                    Application.isListeningToPair = false;
-                    pairingProcessList.remove(info);
+                    Protocol.isListeningToPair = false;
+                    Protocol.pairingProcessList.remove(info);
                     break;
                 }
             }
