@@ -27,7 +27,7 @@
             android:summary="Play loud sound on other devices to find"
             android:title="Execute Find my devices"
             android:icon="@drawable/ic_fluent_screen_search_24_regular"/>
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:key="NotReceiveFindDevice"
             android:title="Do not receive Find request"
@@ -37,7 +37,7 @@
 
     <PreferenceCategory
         android:title="Tasker Plug-in">
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:key="UseTaskerExtension"
             android:title="Enable Tasker Plugin"
@@ -50,7 +50,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Data Encryption">
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:icon="@drawable/ic_fluent_lock_shield_24_regular"
             android:key="UseDataEncryption"
@@ -68,25 +68,25 @@
 
     <PreferenceCategory
         android:title="Others">
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:key="allowAcceptPairAutomatically"
             android:summary="WARNING: May be paired automatically without user permission"
             android:title="Accept pairing without confirm"
             android:icon="@drawable/ic_fluent_arrow_sync_checkmark_24_regular" />
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:key="showAlreadyConnected"
             android:summary="Display already connected devices in the search list"
             android:title="Search already connected devices"
             android:icon="@drawable/ic_fluent_plug_disconnected_24_regular" />
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:key="UseToastInstead"
             android:defaultValue="false"
             android:title="Use Toast instead of Snackbar"
             android:summary="Using Toast to display messages such as warnings within the app"
             android:icon="@drawable/ic_fluent_channel_alert_24_regular"/>
-        <SwitchPreference
+        <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:key="printDebugLog"
             android:summary="Output debug information about pairing to Logcat"

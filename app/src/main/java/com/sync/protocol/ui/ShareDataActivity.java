@@ -92,7 +92,7 @@ public class ShareDataActivity extends AppCompatActivity {
                         deviceSelectSpinner.setError("Please select action to execute");
                     } else {
                         String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                        com.sync.lib.util.DataUtils.requestAction(this, array[0], array[1], taskSelectSpinner.getText().toString(), data);
+                        DataUtils.requestAction(this, array[0], array[1], taskSelectSpinner.getText().toString(), data);
                         dialog.dismiss();
                     }
                 });

@@ -79,7 +79,7 @@ public class PairDetailActivity extends AppCompatActivity {
             ToastHelper.show(this, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
         });
 
-        com.sync.lib.util.DataUtils.requestData(this, Device_name, Device_id, "battery_info");
+        DataUtils.requestData(this, Device_name, Device_id, "battery_info");
         PairListener.addOnDataReceivedListener(map -> {
             if(Objects.equals(map.get("request_data"), "battery_info") &&
                     Objects.equals(map.get("device_name"), Device_name) &&
@@ -114,7 +114,7 @@ public class PairDetailActivity extends AppCompatActivity {
         testSpeedLayout.setVisibility(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("printDebugLog", false) ? View.VISIBLE : View.GONE);
         testSpeedLayout.setOnClickListener((v) -> {
             currentTime.set(Calendar.getInstance().getTimeInMillis());
-            com.sync.lib.util.DataUtils.requestData(this, Device_name, Device_id, "speed_test");
+            DataUtils.requestData(this, Device_name, Device_id, "speed_test");
         });
 
         PairListener.addOnDataReceivedListener(map -> {

@@ -82,7 +82,7 @@ public class DataUtils {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
 
-        com.sync.lib.util.DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
+        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
     public static void sendFindTaskNotification(Context context) {
@@ -133,7 +133,7 @@ public class DataUtils {
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        com.sync.lib.util.DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
+        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
     public static void responseDataRequest(PairDeviceInfo device, String dataType, String dataContent, Context context) {
@@ -160,7 +160,7 @@ public class DataUtils {
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        com.sync.lib.util.DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
+        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
     public static void requestAction(Context context, String Device_name, String Device_id, String dataType, String... args) {
@@ -195,6 +195,6 @@ public class DataUtils {
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        com.sync.lib.util.DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
+        DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 }

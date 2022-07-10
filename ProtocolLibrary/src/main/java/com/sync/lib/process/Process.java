@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.sync.lib.Protocol;
 import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.util.DataUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +86,16 @@ public class Process {
     }
 
     public static void responsePairAcceptation(PairDeviceInfo device, boolean isAccepted, Context context) {
+        if(isAccepted) {
+            for(PairDeviceInfo info : Protocol.pairingProcessList) {
+                if(info.getDevice_name().equals(device.getDevice_name()) && info.getDevice_id().equals(device.getDevice_id())) {
+                    Protocol.isListeningToPair = false;
+                    Protocol.pairingProcessList.remove(info);
+                    break;
+                }
+            }
+        }
+
         String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
         JSONObject notificationHead = new JSONObject();
         JSONObject notificationBody = new JSONObject();
@@ -102,7 +113,7 @@ public class Process {
             Log.e("Noti", "onCreate: " + e.getMessage() );
         }
 
-        com.sync.lib.util.DataUtils.sendNotification(notificationHead, "pair.func", context);
+        DataUtils.sendNotification(notificationHead, "pair.func", context);
     }
 
     public static void checkPairResultAndRegister(Map<String, String> map, PairDeviceInfo info, Context context) {
