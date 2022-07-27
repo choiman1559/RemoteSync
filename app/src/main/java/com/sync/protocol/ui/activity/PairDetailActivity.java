@@ -22,6 +22,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.sync.lib.action.PairListener;
 import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.process.Process;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
 import com.sync.protocol.ui.ToastHelper;
@@ -68,6 +69,7 @@ public class PairDetailActivity extends AppCompatActivity {
         deviceIdInfo.setText("Device's unique address: " + Device_id);
 
         forgetButton.setOnClickListener(v -> {
+            Process.requestRemovePair(this, Device_name, Device_id);
             Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
             list.remove(Device_name + "|" + Device_id);
             prefs.edit().putStringSet("paired_list", list).apply();
@@ -85,7 +87,7 @@ public class PairDetailActivity extends AppCompatActivity {
                     Objects.equals(map.get("device_name"), Device_name) &&
                     Objects.equals(map.get("device_id"), Device_id)) {
                 String[] data = Objects.requireNonNull(map.get("receive_data")).split("\\|");
-                int batteryInt = Integer.parseInt(data[0]);
+                int batteryInt = data[0].equals("undefined") ? 0 : Integer.parseInt(data[0]);
                 int resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_warning_24_regular;
 
                 if(batteryInt < 10) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_0_24_regular;

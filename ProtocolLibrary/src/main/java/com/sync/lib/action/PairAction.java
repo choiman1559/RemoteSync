@@ -9,4 +9,5 @@ public class PairAction {
     public void onActionRequested(Map<String, String> map, Context context) {}
     public void onDataRequested(Map<String, String> map, Context context) {}
     public void showPairChoiceAction(Map<String, String> map, Context context) {}
+    public void onPairRemoved(Map<String, String> map) {}
 }

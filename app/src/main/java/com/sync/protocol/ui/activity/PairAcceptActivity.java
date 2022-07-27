@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
-import com.sync.lib.Protocol;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.process.Process;
 import com.sync.protocol.R;

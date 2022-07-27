@@ -64,6 +64,12 @@ public class ProcessUtil {
                         }
                         break;
 
+                    case "pair|request_remove":
+                        if(isTargetDevice(map) && isPairedDevice(map) && Protocol.connectionOption.isAllowRemovePairRemotely()) {
+                            Process.removePairedDevice(map);
+                        }
+                        break;
+
                     case "pair|request_data":
                         //process request normal data here sent by paired device(s).
                         if (isTargetDevice(map) && isPairedDevice(map)) {

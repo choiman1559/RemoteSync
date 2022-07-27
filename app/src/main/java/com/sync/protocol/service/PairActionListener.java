@@ -26,4 +26,10 @@ public class PairActionListener extends PairAction {
     public void showPairChoiceAction(Map<String, String> map, Context context) {
         DataProcess.showPairChoiceAction(map, context);
     }
+
+    @Override
+    public void onPairRemoved(Map<String, String> map) {
+        super.onPairRemoved(map);
+        //Useless for now: Ignore this event
+    }
 }

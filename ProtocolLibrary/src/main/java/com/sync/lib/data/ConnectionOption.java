@@ -8,6 +8,7 @@ public class ConnectionOption {
     private boolean printDebugLog;
     private boolean showAlreadyConnected;
     private boolean isReceiveFindRequest;
+    private boolean allowRemovePairRemotely;
     private String serverKey;
 
     public ConnectionOption() {
@@ -53,6 +54,10 @@ public class ConnectionOption {
         this.showAlreadyConnected = showAlreadyConnected;
     }
 
+    public void setAllowRemovePairRemotely(boolean allowRemovePairRemotely) {
+        this.allowRemovePairRemotely = allowRemovePairRemotely;
+    }
+
     public boolean isEncryptionEnabled() {
         return encryptionEnabled;
     }
@@ -83,5 +88,9 @@ public class ConnectionOption {
 
     public String getServerKey() {
         return serverKey;
+    }
+
+    public boolean isAllowRemovePairRemotely() {
+        return allowRemovePairRemotely;
     }
 }
