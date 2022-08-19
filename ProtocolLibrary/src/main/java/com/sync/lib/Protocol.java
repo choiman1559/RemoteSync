@@ -10,13 +10,11 @@ import androidx.annotation.NonNull;
 
 import com.sync.lib.action.PairAction;
 import com.sync.lib.data.ConnectionOption;
-import com.sync.lib.data.PacketData;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.process.ProcessUtil;
 import com.sync.lib.util.AESCrypto;
 import com.sync.lib.util.CompressStringUtil;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.GeneralSecurityException;
@@ -58,26 +56,15 @@ public class Protocol {
 
     @SuppressWarnings("unchecked")
     public static void onMessageReceived(@NonNull Map<String, String> map) {
-        /*PacketData data = new PacketData(map);
-        if(data.isEncrypted()) {
-            if (connectionOption.isEncryptionEnabled() && !connectionOption.getEncryptionPassword().equals("")) {
-                try {
-                    data = data.decryptData(connectionOption.getEncryptionPassword());
-                } catch (JSONException | GeneralSecurityException e) {
-                    e.printStackTrace();
-                }
-                ProcessUtil.processReception(map, applicationContext);
-            }
-        } else ProcessUtil.processReception(map, applicationContext);*/
-
         if ("true".equals(map.get("encrypted"))) {
             if (connectionOption.isEncryptionEnabled() && !connectionOption.getEncryptionPassword().equals("")) {
                 try {
-                    JSONObject object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword()));
+                    String hashKey = "true".equals(map.get("isFirstFetch")) ? Protocol.connectionOption.getPairingKey() : Protocol.connectionOption.getIdentifierValue();
+                    JSONObject object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword(), hashKey));
                     Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
                     ProcessUtil.processReception(newMap, applicationContext);
                 } catch (GeneralSecurityException e) {
-                    Log.e("SyncProtocol", "Error occurred while decrypting data!\nPlease check password and try again!");
+                    Log.e("SyncProtocol", "Error occurred while decrypting data!\nCause: " + e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -16,17 +16,11 @@
             android:icon="@drawable/ic_fluent_fingerprint_24_regular"/>
         <Preference
             android:icon="@drawable/ic_info_outline_black_24dp"
-            android:key="EncryptionInfo"
             android:summary="Changing these options requires re-pairing on all paired devices." />
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Find my device">
-        <Preference
-            android:key="findPhone"
-            android:summary="Play loud sound on other devices to find"
-            android:title="Execute Find my devices"
-            android:icon="@drawable/ic_fluent_screen_search_24_regular"/>
         <com.sync.protocol.utils.SwitchedPreference
             android:defaultValue="false"
             android:key="NotReceiveFindDevice"

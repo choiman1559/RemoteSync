@@ -14,8 +14,8 @@ android {
         applicationId "com.sync.protocol"
         minSdk 21
         targetSdk 32
-        versionCode 1000106
-        versionName "0.1.6"
+        versionCode 1000107
+        versionName "0.1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,11 +39,11 @@ dependencies {
     implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.multidex:multidex:2.0.1'
 
-    implementation 'com.google.android.material:material:1.7.0-alpha03'
+    implementation 'com.google.android.material:material:1.7.0-beta01'
 
     implementation platform('com.google.firebase:firebase-bom:30.2.0')
     implementation 'com.google.firebase:firebase-messaging'
@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage'
 
     implementation project (':ProtocolLibrary')
-    //implementation 'com.sync.lib:protocol-library:0.1.4@aar'
+    //implementation 'com.sync.lib:protocol-library:0.1.6@aar'
 
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.github.isradeleon:Notify-Android:1.0.4'

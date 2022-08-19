@@ -20,6 +20,10 @@ import java.util.Map;
 
 public class DataUtils {
     public static void sendNotification(JSONObject notification, String PackageName, Context context) {
+        sendNotification(notification, PackageName, context, false);
+    }
+
+    public static void sendNotification(JSONObject notification, String PackageName, Context context, boolean isFirstFetch) {
         final String FCM_API = "https://fcm.googleapis.com/fcm/send";
         final String serverKey = Protocol.getConnectionOption().getServerKey();
         final String contentType = "application/json";
@@ -29,10 +33,11 @@ public class DataUtils {
             String rawPassword = Protocol.getConnectionOption().getEncryptionPassword();
             JSONObject data = notification.getJSONObject("data");
             if (Protocol.connectionOption.isEncryptionEnabled() && !rawPassword.equals("")) {
-                String encryptedData = AESCrypto.encrypt(notification.getJSONObject("data").toString(), rawPassword);
+                String encryptedData = AESCrypto.encrypt(notification.getJSONObject("data").toString(), rawPassword, isFirstFetch ? Protocol.connectionOption.getPairingKey() : data.getString("send_device_id"));
 
                 JSONObject newData = new JSONObject();
                 newData.put("encrypted", "true");
+                newData.put("isFirstFetch", isFirstFetch);
                 newData.put("encryptedData", CompressStringUtil.compressString(encryptedData));
                 notification.put("data", newData);
             } else {
@@ -83,31 +88,6 @@ public class DataUtils {
         }
 
         DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
-    }
-
-    public static void sendFindTaskNotification(Context context) {
-        boolean isLogging = Protocol.connectionOption.isPrintDebugLog();
-        Date date = Calendar.getInstance().getTime();
-
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = Protocol.connectionOption.getIdentifierValue();
-        String TOPIC = "/topics/" + Protocol.connectionOption.getPairingKey();
-
-        JSONObject notificationHead = new JSONObject();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put("type", "send|find");
-            notificationBody.put("device_name", DEVICE_NAME);
-            notificationBody.put("device_id", DEVICE_ID);
-            notificationBody.put("date", date);
-
-            notificationHead.put("to", TOPIC);
-            notificationHead.put("data", notificationBody);
-        } catch (JSONException e) {
-            if (isLogging) Log.e("Noti", "onCreate: " + e.getMessage());
-        }
-        if (isLogging) Log.d("data", notificationHead.toString());
-        sendNotification(notificationHead, context.getPackageName(), context);
     }
 
     public static void requestData(Context context, String Device_name, String Device_id, String dataType) {

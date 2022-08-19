@@ -131,7 +131,7 @@ public class DataProcess {
                     break;
 
                 case "Run application":
-                    new Handler(Looper.getMainLooper()).postDelayed(() -> Toast.makeText(context, "Remote run by NotiSender\nfrom " + map.get("device_name"), Toast.LENGTH_SHORT).show(), 0);
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> Toast.makeText(context, "Remote run by SyncProtocol\nfrom " + map.get("device_name"), Toast.LENGTH_SHORT).show(), 0);
                     String Package = actionArgs[0].trim();
                     try {
                         PackageManager pm = context.getPackageManager();

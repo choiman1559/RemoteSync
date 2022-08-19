@@ -37,7 +37,7 @@ public class Process {
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        sendNotification(notificationHead, "pair.func", context);
+        sendNotification(notificationHead, "pair.func", context, true);
         if (isShowDebugLog()) Log.d("sync sent", "request list: " + notificationBody);
     }
 
@@ -105,7 +105,7 @@ public class Process {
             notificationBody.put("device_id", Protocol.getConnectionOption().getIdentifierValue());
             notificationBody.put("send_device_name", device.getDevice_name());
             notificationBody.put("send_device_id", device.getDevice_id());
-            notificationBody.put("pair_accept", isAccepted);
+            notificationBody.put("pair_accept", isAccepted ? "true" : "false");
             notificationHead.put("to", Topic);
             notificationHead.put("priority", "high");
             notificationHead.put("data", notificationBody);
@@ -117,8 +117,6 @@ public class Process {
     }
 
     public static void checkPairResultAndRegister(Map<String, String> map, PairDeviceInfo info, Context context) {
-        if (isShowDebugLog())
-            Log.i("pair result", "device name: " + map.get("device_name") + " /device id: " + map.get("device_id") + " /result: " + map.get("pair_accept"));
         if (m_onDevicePairResultListener != null) m_onDevicePairResultListener.onReceive(map);
         if ("true".equals(map.get("pair_accept"))) {
             SharedPreferences prefs = context.getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
@@ -126,14 +124,14 @@ public class Process {
             String dataToSave = map.get("device_name") + "|" + map.get("device_id");
 
             Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
-            for (String str : list) {
-                if (str.equals(dataToSave)) {
+            for(String str : list) {
+                if(str.equals(dataToSave)) {
                     isNotRegistered = false;
                     break;
                 }
             }
 
-            if (isNotRegistered) {
+            if(isNotRegistered) {
                 list.add(dataToSave);
                 prefs.edit().putStringSet("paired_list", list).apply();
             }

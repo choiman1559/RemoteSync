@@ -98,13 +98,6 @@ public class PairPreference extends PreferenceFragmentCompat  {
         LinearLayout.LayoutParams layoutParams;
 
         switch(preference.getKey()) {
-            case "findPhone":
-                if(!prefs.getString("UID","").isEmpty()) {
-                    DataUtils.sendFindTaskNotification(mContext);
-                    ToastHelper.show(mContext, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
-                } else ToastHelper.show(mContext, "Please check your account status and try again!","Dismiss", ToastHelper.LENGTH_SHORT);
-                break;
-
             case "PairingKey":
                 dialog = new MaterialAlertDialogBuilder(new ContextThemeWrapper(mContext, R.style.MaterialAlertDialog_Material3));
                 dialog.setIcon(com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_edit_24_regular);

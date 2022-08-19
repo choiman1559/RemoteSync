@@ -1,31 +1,59 @@
 package com.sync.lib.util;
 
 import android.util.Base64;
+import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESCrypto {
-    public static String encrypt(String plain, String TOKEN_KEY) throws Exception {
+    public static String encrypt(String plain, String TOKEN_KEY, String MacKey) throws Exception {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(parseAESToken(TOKEN_KEY).getBytes(StandardCharsets.UTF_8), "AES"), new IvParameterSpec(iv));
         byte[] cipherText = cipher.doFinal(plain.getBytes(StandardCharsets.UTF_8));
-        byte[] ivAndCipherText = getCombinedArray(iv, cipherText);
-        return Base64.encodeToString(ivAndCipherText, Base64.NO_WRAP);
+
+        final String HMacAlgorithm = "HmacSHA256";
+        SecretKeySpec secretKey = new SecretKeySpec(MacKey.getBytes(StandardCharsets.UTF_8), HMacAlgorithm);
+        Mac hasher = Mac.getInstance(HMacAlgorithm);
+
+        hasher.init(secretKey);
+        hasher.update(iv);
+        hasher.update(cipherText);
+
+        byte[] hash = hasher.doFinal();
+        byte[] ivAndHash = getCombinedArray(iv, hash);
+        byte[] finalByteArray = getCombinedArray(ivAndHash, cipherText);
+        return Base64.encodeToString(finalByteArray, Base64.NO_WRAP);
     }
 
-    public static String decrypt(String encoded, String TOKEN_KEY) throws GeneralSecurityException {
-        byte[] ivAndCipherText = Base64.decode(encoded, Base64.NO_WRAP);
-        byte[] iv = Arrays.copyOfRange(ivAndCipherText, 0, 16);
-        byte[] cipherText = Arrays.copyOfRange(ivAndCipherText, 16, ivAndCipherText.length);
+    public static String decrypt(String encoded, String TOKEN_KEY, String MacKey) throws GeneralSecurityException {
+        byte[] rawByteArray = Base64.decode(encoded, Base64.NO_WRAP);
+        byte[] iv = Arrays.copyOfRange(rawByteArray, 0, 16);
+        byte[] hash = Arrays.copyOfRange(rawByteArray, 16, 48);
+        byte[] cipherText = Arrays.copyOfRange(rawByteArray, 48, rawByteArray.length);
+
+        final String HMacAlgorithm = "HmacSHA256";
+        SecretKeySpec secretKey = new SecretKeySpec(MacKey.getBytes(StandardCharsets.UTF_8), HMacAlgorithm);
+        Mac hasher = Mac.getInstance(HMacAlgorithm);
+
+        hasher.init(secretKey);
+        hasher.update(iv);
+        hasher.update(cipherText);
+
+        byte[] referenceHash = hasher.doFinal();
+        if (!MessageDigest.isEqual(referenceHash, hash)) {
+            throw new GeneralSecurityException("Could not authenticate! Please check if data is modified by unknown attacker or sent from unpaired (or maybe itself?) device");
+        } else Log.d("enc", "finished: " + new String(referenceHash, StandardCharsets.UTF_8));
 
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(parseAESToken(TOKEN_KEY).getBytes(StandardCharsets.UTF_8), "AES"), new IvParameterSpec(iv));
