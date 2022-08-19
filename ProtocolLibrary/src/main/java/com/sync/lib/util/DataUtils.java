@@ -33,7 +33,13 @@ public class DataUtils {
             String rawPassword = Protocol.getConnectionOption().getEncryptionPassword();
             JSONObject data = notification.getJSONObject("data");
             if (Protocol.connectionOption.isEncryptionEnabled() && !rawPassword.equals("")) {
-                String encryptedData = AESCrypto.encrypt(notification.getJSONObject("data").toString(), rawPassword, isFirstFetch ? Protocol.connectionOption.getPairingKey() : data.getString("send_device_id"));
+                String encryptedData;
+                if(Protocol.connectionOption.isAuthWithHMac()) {
+                    Log.d("ddd", data.getString("send_device_id"));
+                    encryptedData = AESCrypto.encrypt(notification.getJSONObject("data").toString(), rawPassword, isFirstFetch ? Protocol.connectionOption.getPairingKey() : data.getString("send_device_id"));
+                } else {
+                    encryptedData = AESCrypto.encrypt(notification.getJSONObject("data").toString(), rawPassword);
+                }
 
                 JSONObject newData = new JSONObject();
                 newData.put("encrypted", "true");

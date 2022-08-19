@@ -36,6 +36,7 @@ public class PairPreference extends PreferenceFragmentCompat  {
 
     Preference UseDataEncryption;
     Preference UseDataEncryptionPassword;
+    Preference UseAuthWithHMac;
 
     @NonNull
     @Override
@@ -66,12 +67,15 @@ public class PairPreference extends PreferenceFragmentCompat  {
 
         UseDataEncryption = findPreference("UseDataEncryption");
         UseDataEncryptionPassword = findPreference("UseDataEncryptionPassword");
+        UseAuthWithHMac = findPreference("UseAuthWithHMac");
 
         boolean usesDataEncryption = prefs.getBoolean("UseDataEncryption", false);
         UseDataEncryptionPassword.setVisible(usesDataEncryption);
+        UseAuthWithHMac.setVisible(usesDataEncryption);
         UseDataEncryption.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean foo = (boolean) newValue;
             UseDataEncryptionPassword.setVisible(foo);
+            UseAuthWithHMac.setVisible(foo);
             return true;
         });
 
@@ -84,6 +88,7 @@ public class PairPreference extends PreferenceFragmentCompat  {
             option.setPrintDebugLog(prefs.getBoolean("printDebugLog", false));
             option.setDenyFindRequest(prefs.getBoolean("NotReceiveFindDevice", false));
             option.setShowAlreadyConnected(prefs.getBoolean("showAlreadyConnected", false));
+            option.setAuthWithHMac(prefs.getBoolean("UseAuthWithHMac", false));
             option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
 
             Protocol.setConnectionOption(option);

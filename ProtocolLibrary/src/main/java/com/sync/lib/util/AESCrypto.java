@@ -53,7 +53,28 @@ public class AESCrypto {
         byte[] referenceHash = hasher.doFinal();
         if (!MessageDigest.isEqual(referenceHash, hash)) {
             throw new GeneralSecurityException("Could not authenticate! Please check if data is modified by unknown attacker or sent from unpaired (or maybe itself?) device");
-        } else Log.d("enc", "finished: " + new String(referenceHash, StandardCharsets.UTF_8));
+        }
+
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(parseAESToken(TOKEN_KEY).getBytes(StandardCharsets.UTF_8), "AES"), new IvParameterSpec(iv));
+        return new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8);
+    }
+
+    public static String encrypt(String plain, String TOKEN_KEY) throws Exception {
+        byte[] iv = new byte[16];
+        new SecureRandom().nextBytes(iv);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(parseAESToken(TOKEN_KEY).getBytes(StandardCharsets.UTF_8), "AES"), new IvParameterSpec(iv));
+        byte[] cipherText = cipher.doFinal(plain.getBytes(StandardCharsets.UTF_8));
+
+        byte[] finalByteArray = getCombinedArray(iv, cipherText);
+        return Base64.encodeToString(finalByteArray, Base64.NO_WRAP);
+    }
+
+    public static String decrypt(String encoded, String TOKEN_KEY) throws GeneralSecurityException {
+        byte[] rawByteArray = Base64.decode(encoded, Base64.NO_WRAP);
+        byte[] iv = Arrays.copyOfRange(rawByteArray, 0, 16);
+        byte[] cipherText = Arrays.copyOfRange(rawByteArray, 16, rawByteArray.length);
 
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(parseAESToken(TOKEN_KEY).getBytes(StandardCharsets.UTF_8), "AES"), new IvParameterSpec(iv));

@@ -59,8 +59,14 @@ public class Protocol {
         if ("true".equals(map.get("encrypted"))) {
             if (connectionOption.isEncryptionEnabled() && !connectionOption.getEncryptionPassword().equals("")) {
                 try {
-                    String hashKey = "true".equals(map.get("isFirstFetch")) ? Protocol.connectionOption.getPairingKey() : Protocol.connectionOption.getIdentifierValue();
-                    JSONObject object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword(), hashKey));
+                    JSONObject object;
+                    if(connectionOption.isAuthWithHMac()) {
+                        String hashKey = "true".equals(map.get("isFirstFetch")) ? Protocol.connectionOption.getPairingKey() : Protocol.connectionOption.getIdentifierValue();
+                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword(), hashKey));
+                    } else {
+                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword()));
+                    }
+
                     Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
                     ProcessUtil.processReception(newMap, applicationContext);
                 } catch (GeneralSecurityException e) {

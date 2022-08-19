@@ -54,6 +54,12 @@
             android:key="UseDataEncryptionPassword"
             android:summary="Password to use for AES encryption"
             android:title="Password for encryption" />
+        <com.sync.protocol.utils.SwitchedPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_fluent_certificate_24_regular"
+            android:key="UseAuthWithHMac"
+            android:summary="Keep your data safer with HMAC SHA-256"
+            android:title="Use message authentication" />
         <Preference
             android:icon="@drawable/ic_info_outline_black_24dp"
             android:key="EncryptionInfo"
