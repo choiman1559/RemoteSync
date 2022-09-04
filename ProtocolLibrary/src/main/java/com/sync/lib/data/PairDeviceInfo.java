@@ -1,8 +1,19 @@
 package com.sync.lib.data;
 
 public class PairDeviceInfo {
+    /**
+     * device name information
+     */
     private final String Device_name;
+
+    /**
+     * device unique id information
+     */
     private final String Device_id;
+
+    /**
+     * device connection status information
+     */
     @PairDeviceStatus.Status
     private final int Device_status;
 

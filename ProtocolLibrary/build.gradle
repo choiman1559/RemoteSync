@@ -50,7 +50,7 @@ publishing {
         gpr(MavenPublication) {
             groupId "com.sync.lib"
             artifactId "protocol-library"
-            version "0.2.1"
+            version "0.2.2"
             artifact("$buildDir/outputs/aar/ProtocolLibrary-release.aar")
 
             pom.withXml {

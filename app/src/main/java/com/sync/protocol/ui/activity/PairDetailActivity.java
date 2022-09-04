@@ -45,6 +45,7 @@ public class PairDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String Device_name = intent.getStringExtra("device_name");
         String Device_id = intent.getStringExtra("device_id");
+        PairDeviceInfo Device_info = new PairDeviceInfo(Device_name, Device_id);
         SharedPreferences prefs = getSharedPreferences("com.sync.protocol_pair",MODE_PRIVATE);
 
         ImageView icon = findViewById(R.id.icon);
@@ -69,7 +70,7 @@ public class PairDetailActivity extends AppCompatActivity {
         deviceIdInfo.setText("Device's unique address: " + Device_id);
 
         forgetButton.setOnClickListener(v -> {
-            Process.requestRemovePair(this, Device_name, Device_id);
+            Process.requestRemovePair(this, Device_info);
             Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
             list.remove(Device_name + "|" + Device_id);
             prefs.edit().putStringSet("paired_list", list).apply();
@@ -77,11 +78,11 @@ public class PairDetailActivity extends AppCompatActivity {
         });
 
         findButton.setOnClickListener(v -> {
-            DataUtils.sendFindTaskNotification(new PairDeviceInfo(Device_name, Device_id), this);
+            DataUtils.sendFindTaskNotification(this, Device_info);
             ToastHelper.show(this, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
         });
 
-        DataUtils.requestData(this, Device_name, Device_id, "battery_info");
+        DataUtils.requestData(this, Device_info, "battery_info");
         PairListener.addOnDataReceivedListener(map -> {
             if(Objects.equals(map.get("request_data"), "battery_info") &&
                     Objects.equals(map.get("device_name"), Device_name) &&
@@ -116,7 +117,7 @@ public class PairDetailActivity extends AppCompatActivity {
         testSpeedLayout.setVisibility(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("printDebugLog", false) ? View.VISIBLE : View.GONE);
         testSpeedLayout.setOnClickListener((v) -> {
             currentTime.set(Calendar.getInstance().getTimeInMillis());
-            DataUtils.requestData(this, Device_name, Device_id, "speed_test");
+            DataUtils.requestData(this, Device_info, "speed_test");
         });
 
         PairListener.addOnDataReceivedListener(map -> {

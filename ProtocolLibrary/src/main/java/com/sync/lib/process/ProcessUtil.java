@@ -13,6 +13,12 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class ProcessUtil {
+    /**
+     * process incoming data
+     *
+     * @param context Android application class context
+     * @param map Custom class that extends PairAction Listener to get action requested from protocol
+     */
     public static void processReception(Map<String, String> map, Context context) {
         String type = map.get("type");
         if(Protocol.connectionOption.isPrintDebugLog()) Log.d("SyncProtocol", type + "Sent device: " + map.get("device_name") + map.get("device_id"));
@@ -101,6 +107,11 @@ public class ProcessUtil {
         }
     }
 
+    /**
+     * Check that the device that sent the data and the device that received the data are the same device
+     *
+     * @param map raw data received from push server
+     */
     protected static boolean isDeviceItself(Map<String, String> map) {
         String Device_name = map.get("device_name");
         String Device_id = map.get("device_id");
@@ -116,6 +127,11 @@ public class ProcessUtil {
         return DEVICE_NAME.equals(Device_name) && DEVICE_ID.equals(Device_id);
     }
 
+    /**
+     * Check if the target of the data is this device
+     *
+     * @param map raw data received from push server
+     */
     protected static boolean isTargetDevice(Map<String, String> map) {
         String Device_name = map.get("send_device_name");
         String Device_id = map.get("send_device_id");
@@ -126,6 +142,11 @@ public class ProcessUtil {
         return DEVICE_NAME.equals(Device_name) && DEVICE_ID.equals(Device_id);
     }
 
+    /**
+     * Check if the device that sent this data is paired
+     *
+     * @param map raw data received from push server
+     */
     protected static boolean isPairedDevice(Map<String, String> map) {
         String dataToFind = map.get("device_name") + "|" + map.get("device_id");
         for (String str : Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>())) {

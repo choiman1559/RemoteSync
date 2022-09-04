@@ -19,10 +19,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DataUtils {
+    /**
+     * Send json data to push server
+     *
+     * @param notification Json data to send push server
+     * @param PackageName Current working app's package name
+     * @param context current Android context instance
+     */
     public static void sendNotification(JSONObject notification, String PackageName, Context context) {
         sendNotification(notification, PackageName, context, false);
     }
 
+    /**
+     * Send json data to push server
+     *
+     * @param notification Json data to send push server
+     * @param PackageName Current working app's package name
+     * @param context current Android context instance
+     * @param isFirstFetch Whether or not you are pitching with the target device for the first time
+     */
     public static void sendNotification(JSONObject notification, String PackageName, Context context, boolean isFirstFetch) {
         final String FCM_API = "https://fcm.googleapis.com/fcm/send";
         final String serverKey = Protocol.getConnectionOption().getServerKey();
@@ -71,7 +86,13 @@ public class DataUtils {
         JsonRequest.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public static void sendFindTaskNotification(PairDeviceInfo device, Context context) {
+    /**
+     * request find task to target device
+     *
+     * @param device target device to send
+     * @param context current Android context instance
+     */
+    public static void sendFindTaskNotification(Context context, PairDeviceInfo device) {
         Date date = Calendar.getInstance().getTime();
         String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
         String DEVICE_ID = Protocol.connectionOption.getIdentifierValue();
@@ -96,7 +117,14 @@ public class DataUtils {
         DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
-    public static void requestData(Context context, String Device_name, String Device_id, String dataType) {
+    /**
+     * request some data to target device
+     *
+     * @param device target device to send
+     * @param context current Android context instance
+     * @param dataType type of data to request
+     */
+    public static void requestData(Context context, PairDeviceInfo device, String dataType) {
         Date date = Calendar.getInstance().getTime();
         String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
         String DEVICE_ID = Protocol.connectionOption.getIdentifierValue();
@@ -108,8 +136,8 @@ public class DataUtils {
             notificationBody.put("type", "pair|request_data");
             notificationBody.put("device_name", DEVICE_NAME);
             notificationBody.put("device_id", DEVICE_ID);
-            notificationBody.put("send_device_name", Device_name);
-            notificationBody.put("send_device_id", Device_id);
+            notificationBody.put("send_device_name", device.getDevice_name());
+            notificationBody.put("send_device_id", device.getDevice_id());
             notificationBody.put("request_data", dataType);
             notificationBody.put("date", date);
 
@@ -122,6 +150,14 @@ public class DataUtils {
         DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
+    /**
+     * response to the device requesting the data
+     *
+     * @param device target device to send
+     * @param context current Android context instance
+     * @param dataType type of data requested
+     * @param dataContent the value of the requested data
+     */
     public static void responseDataRequest(PairDeviceInfo device, String dataType, String dataContent, Context context) {
         Date date = Calendar.getInstance().getTime();
         String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
@@ -149,7 +185,15 @@ public class DataUtils {
         DataUtils.sendNotification(notificationHead, context.getPackageName(), context);
     }
 
-    public static void requestAction(Context context, String Device_name, String Device_id, String dataType, String... args) {
+    /**
+     * request some action to target device
+     *
+     * @param device target device to send
+     * @param context current Android context instance
+     * @param dataType type of data requested
+     * @param args Argument data required to execute the action
+     */
+    public static void requestAction(Context context, PairDeviceInfo device, String dataType, String... args) {
         StringBuilder dataToSend = new StringBuilder();
         if (args.length > 1) {
             for (String str : args) {
@@ -169,8 +213,8 @@ public class DataUtils {
             notificationBody.put("type", "pair|request_action");
             notificationBody.put("device_name", DEVICE_NAME);
             notificationBody.put("device_id", DEVICE_ID);
-            notificationBody.put("send_device_name", Device_name);
-            notificationBody.put("send_device_id", Device_id);
+            notificationBody.put("send_device_name", device.getDevice_name());
+            notificationBody.put("send_device_id", device.getDevice_id());
             notificationBody.put("request_action", dataType);
             notificationBody.put("date", date);
             if (args.length > 0) notificationBody.put("action_args", dataToSend.toString());

@@ -11,10 +11,22 @@ import java.util.zip.InflaterInputStream;
 public class CompressStringUtil {
     private static final String charsetName = "UTF-8";
 
+    /**
+     * compress string using DeflaterOutputStream
+     *
+     * @param string String to compress
+     * @return compressed output
+     */
     public synchronized static String compressString(String string) {
         return byteToString(compress(string));
     }
 
+    /**
+     * decompress string using InflaterOutputStream
+     *
+     * @param compressed String to decompress
+     * @return decompressed output
+     */
     public synchronized static String decompressString(String compressed) {
         return decompress(hexToByteArray(compressed));
     }

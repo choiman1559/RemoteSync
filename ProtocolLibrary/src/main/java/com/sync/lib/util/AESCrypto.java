@@ -15,6 +15,15 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESCrypto {
+    /**
+     * encrypt string using AES-256-CBC then HMAC-256
+     *
+     * @param plain String to encode
+     * @param TOKEN_KEY password to encode
+     * @param MacKey HMAC password to create hash
+     * @return encoded output
+     * @throws Exception throws when error occurred during encrypt
+     */
     public static String encrypt(String plain, String TOKEN_KEY, String MacKey) throws Exception {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
@@ -36,6 +45,15 @@ public class AESCrypto {
         return Base64.encodeToString(finalByteArray, Base64.NO_WRAP);
     }
 
+    /**
+     * decrypt string using AES-256-CBC then HMAC-256
+     *
+     * @param encoded String to decrypt
+     * @param TOKEN_KEY password to decrypt
+     * @param MacKey HMAC password to create hash
+     * @return decrypt output
+     * @throws GeneralSecurityException throws when error occurred during decrypt
+     */
     public static String decrypt(String encoded, String TOKEN_KEY, String MacKey) throws GeneralSecurityException {
         byte[] rawByteArray = Base64.decode(encoded, Base64.NO_WRAP);
         byte[] iv = Arrays.copyOfRange(rawByteArray, 0, 16);
@@ -60,6 +78,14 @@ public class AESCrypto {
         return new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8);
     }
 
+    /**
+     * encrypt string using AES-256-CBC only
+     *
+     * @param plain String to encode
+     * @param TOKEN_KEY password to encode
+     * @return encoded output
+     * @throws Exception throws when error occurred during encrypt
+     */
     public static String encrypt(String plain, String TOKEN_KEY) throws Exception {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
@@ -71,6 +97,14 @@ public class AESCrypto {
         return Base64.encodeToString(finalByteArray, Base64.NO_WRAP);
     }
 
+    /**
+     * decrypt string using AES-256-CBC only
+     *
+     * @param encoded String to decode
+     * @param TOKEN_KEY password to decode
+     * @return decoded output
+     * @throws GeneralSecurityException throws when error occurred during decrypt
+     */
     public static String decrypt(String encoded, String TOKEN_KEY) throws GeneralSecurityException {
         byte[] rawByteArray = Base64.decode(encoded, Base64.NO_WRAP);
         byte[] iv = Arrays.copyOfRange(rawByteArray, 0, 16);

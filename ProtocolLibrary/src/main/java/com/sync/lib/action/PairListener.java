@@ -32,10 +32,6 @@ final public class PairListener {
         if(!m_onDataReceivedListener.contains(mOnDataReceivedListener)) m_onDataReceivedListener.add(mOnDataReceivedListener);
     }
 
-    public static void removeOnDataReceivedListener(int index) {
-
-    }
-
     public static void callOnDataReceived(Map<String, String> map) {
         if(m_onDataReceivedListener != null) {
             for (onDataReceivedListener listener : m_onDataReceivedListener) {

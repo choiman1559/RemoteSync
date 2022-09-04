@@ -18,6 +18,12 @@ public class JsonRequest {
         requestQueue = getRequestQueue();
     }
 
+    /**
+     * initialize class if instance is not available, then return instance
+     *
+     * @param context Android application class context
+     * @return A JsonRequest instance.
+     */
     public static synchronized JsonRequest getInstance(Context context) {
         if (instance == null) {
             instance = new JsonRequest(context);
@@ -25,6 +31,11 @@ public class JsonRequest {
         return instance;
     }
 
+    /**
+     * Creates a default instance of the worker pool and calls RequestQueue.start() on it.
+     *
+     * @return A started RequestQueue instance.
+     */
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
@@ -32,6 +43,11 @@ public class JsonRequest {
         return requestQueue;
     }
 
+    /**
+     * Adds a Request to the dispatch queue.
+     * @param req Json request instance to query
+     * @param <T> object type
+     */
     public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }

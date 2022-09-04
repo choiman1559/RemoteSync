@@ -100,7 +100,7 @@ public class PairingActivity extends AppCompatActivity {
         holder.icon.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(colorLow[randomIndex])));
 
         layout.setOnClickListener(v -> {
-            Process.requestPair(Device_name, Device_id, PairingActivity.this);
+            Process.requestPair(new PairDeviceInfo(Device_name, Device_id), PairingActivity.this);
             progress.setVisibility(View.GONE);
 
             holder.pairStatus.setText("Connecting...");

@@ -32,6 +32,13 @@ public class Protocol {
     public static Context applicationContext;
     public static PairAction action;
 
+    /**
+     * initialize protocol
+     * This method must be called on Application startup before use the protocol
+     *
+     * @param context Android application class context
+     * @param object Custom class that extends PairAction Listener to get action requested from protocol
+     */
     public static void initialize(Context context, PairAction object) {
         isFindingDeviceToPair = false;
         isListeningToPair = false;
@@ -42,18 +49,36 @@ public class Protocol {
         action = object;
     }
 
+    /**
+     * apply new connection option
+     *
+     * @param connectionOption user-customized connection option
+     */
     public static void setConnectionOption(ConnectionOption connectionOption) {
         Protocol.connectionOption = connectionOption;
     }
 
+    /**
+     * get current connection option
+     * @return current ConnectionOption object
+     */
     public static ConnectionOption getConnectionOption() {
         return connectionOption;
     }
 
+    /**
+     * get list of current pairing devices
+     * @return current ArrayList<PairDeviceInfo> object
+     */
     public static ArrayList<PairDeviceInfo> getPairingProcessList() {
         return pairingProcessList;
     }
 
+    /**
+     * When the data received from FCM is passed to this function, the protocol starts processing
+     *
+     * @param map Raw data from FCM
+     */
     @SuppressWarnings("unchecked")
     public static void onMessageReceived(@NonNull Map<String, String> map) {
         if ("true".equals(map.get("encrypted"))) {

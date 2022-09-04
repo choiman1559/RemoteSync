@@ -32,6 +32,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
 
@@ -92,7 +93,7 @@ public class ShareDataActivity extends AppCompatActivity {
                         deviceSelectSpinner.setError("Please select action to execute");
                     } else {
                         String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                        DataUtils.requestAction(this, array[0], array[1], taskSelectSpinner.getText().toString(), data);
+                        DataUtils.requestAction(this, new PairDeviceInfo(array[0], array[1]), taskSelectSpinner.getText().toString(), data);
                         dialog.dismiss();
                     }
                 });
@@ -155,7 +156,7 @@ public class ShareDataActivity extends AppCompatActivity {
                                 completeDialog.show();
 
                                 String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                                DataUtils.requestAction(this, array[0], array[1], "Share file", name);
+                                DataUtils.requestAction(this, new PairDeviceInfo(array[0], array[1]), "Share file", name);
                             });
 
                             uploadTask.addOnProgressListener(snapshot -> {

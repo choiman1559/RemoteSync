@@ -12,6 +12,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
 
@@ -32,6 +33,7 @@ public class RequestActionActivity extends AppCompatActivity {
 
         String Device_name = intent.getStringExtra("device_name");
         String Device_id = intent.getStringExtra("device_id");
+        PairDeviceInfo Device_info = new PairDeviceInfo(Device_name, Device_id);
         deviceName.setText(Device_name);
 
         taskArgs0.setVisibility(View.GONE);
@@ -87,11 +89,11 @@ public class RequestActionActivity extends AppCompatActivity {
                 taskArgs1.setError("Please type argument");
             } else {
                 if (taskArgs0.getVisibility() == View.VISIBLE && taskArgs1.getVisibility() == View.VISIBLE) {
-                    DataUtils.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
+                    DataUtils.requestAction(this, Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
                 } else if (taskArgs0.getVisibility() == View.VISIBLE) {
-                    DataUtils.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
+                    DataUtils.requestAction(this, Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
                 } else {
-                    DataUtils.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString());
+                    DataUtils.requestAction(this, Device_info, taskSelectSpinner.getText().toString());
                 }
 
                 ToastHelper.show(this, "Your request is posted!", "OK", ToastHelper.LENGTH_SHORT);
