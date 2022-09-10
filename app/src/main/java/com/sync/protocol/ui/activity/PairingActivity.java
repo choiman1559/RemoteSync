@@ -46,19 +46,19 @@ public class PairingActivity extends AppCompatActivity {
         deviceListLayout = findViewById(R.id.deviceListLayout);
 
         PairListener.setOnDeviceFoundListener(map -> PairingActivity.this.runOnUiThread(() -> {
-            String[] data = {map.get("device_name"), map.get("device_id")};
-            if(data[0] != null && data[1] != null) {
+            PairDeviceInfo device = new PairDeviceInfo(map.get("device_name"), map.get("device_id"));
+            if(device.getDevice_name() != null && device.getDevice_id() != null) {
                 boolean isDeviceNotQueried = true;
                 for(PairDeviceInfo info : infoList) {
-                    if(info.getDevice_name().equals(data[0]) && info.getDevice_id().equals(data[1])) {
+                    if(info.equals(device)) {
                         isDeviceNotQueried = false;
                         break;
                     }
                 }
 
                 if(isDeviceNotQueried) {
-                    infoList.add(new PairDeviceInfo(data[0], data[1], PairDeviceStatus.Device_Process_Pairing));
-                    notifyDataSetChanged(data[0], data[1]);
+                    infoList.add(device.setDevice_status(PairDeviceStatus.Device_Process_Pairing));
+                    notifyDataSetChanged(device);
                 }
             }
         }));
@@ -66,7 +66,9 @@ public class PairingActivity extends AppCompatActivity {
         PairListener.setOnDevicePairResultListener(map -> {
             for(int i = 0;i < infoList.size(); i++) {
                 PairDeviceInfo info = infoList.get(i);
-                if(info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
+                PairDeviceInfo device = new PairDeviceInfo(map.get("device_name"), map.get("device_id"));
+
+                if(info.equals(device)) {
                     int finalI = i;
                     PairingActivity.this.runOnUiThread(() -> {
                         RelativeLayout view = (RelativeLayout) deviceListLayout.getChildAt(finalI);
@@ -87,20 +89,20 @@ public class PairingActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener((v) -> this.finish());
     }
 
-    public void notifyDataSetChanged(String Device_name, String Device_id) {
+    public void notifyDataSetChanged(PairDeviceInfo device) {
         RelativeLayout layout = (RelativeLayout) View.inflate(PairingActivity.this, R.layout.cardview_pair_device, null);
         Holder holder = new Holder(layout);
 
         String[] colorLow = PairingActivity.this.getResources().getStringArray(R.array.material_color_low);
         String[] colorHigh = PairingActivity.this.getResources().getStringArray(R.array.material_color_high);
-        int randomIndex = new Random(Device_name.hashCode()).nextInt(colorHigh.length);
+        int randomIndex = new Random(device.getDevice_name().hashCode()).nextInt(colorHigh.length);
 
-        holder.deviceName.setText(Device_name);
+        holder.deviceName.setText(device.getDevice_name());
         holder.icon.setImageTintList(ColorStateList.valueOf(Color.parseColor(colorHigh[randomIndex])));
         holder.icon.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(colorLow[randomIndex])));
 
         layout.setOnClickListener(v -> {
-            Process.requestPair(new PairDeviceInfo(Device_name, Device_id), PairingActivity.this);
+            Process.requestPair(device, PairingActivity.this);
             progress.setVisibility(View.GONE);
 
             holder.pairStatus.setText("Connecting...");

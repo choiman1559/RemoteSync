@@ -12,7 +12,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -281,27 +280,6 @@ public class DataProcess {
     }
 
     public static void showPairChoiceAction(Map<String, String> map, Context context) {
-        if(context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("allowAcceptPairAutomatically", false)) {
-            PairAcceptActivity.sendAcceptedMessage(map.get("device_name"), map.get("device_id"), true, context);
-            SharedPreferences prefs = context.getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
-            boolean isNotRegistered = true;
-            String dataToSave = map.get("device_name") + "|" + map.get("device_id");
-
-            Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
-            for(String str : list) {
-                if(str.equals(dataToSave)) {
-                    isNotRegistered = false;
-                    break;
-                }
-            }
-
-            if(isNotRegistered) {
-                list.add(dataToSave);
-                prefs.edit().putStringSet("paired_list", list).apply();
-            }
-            return;
-        }
-
         int uniqueCode = (int) (Calendar.getInstance().getTime().getTime() / 1000L % Integer.MAX_VALUE);
 
         Intent notificationIntent = new Intent(context, PairAcceptActivity.class);

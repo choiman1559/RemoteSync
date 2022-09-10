@@ -24,12 +24,14 @@ public class ProcessUtil {
         if(Protocol.connectionOption.isPrintDebugLog()) Log.d("SyncProtocol", type + "Sent device: " + map.get("device_name") + map.get("device_id"));
         if (type != null && !Protocol.connectionOption.getPairingKey().equals("")) {
             if (type.startsWith("pair") && !isDeviceItself(map)) {
+                PairDeviceInfo device = new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing);
+
                 switch (type) {
                     case "pair|request_device_list":
                         //Target Device action
                         //Have to Send this device info Data Now
                         if (!isPairedDevice(map) || Protocol.connectionOption.isShowAlreadyConnected()) {
-                            Protocol.pairingProcessList.add(new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing));
+                            Protocol.pairingProcessList.add(device);
                             Protocol.isListeningToPair = true;
                             Process.responseDeviceInfoToFinder(map, context);
                         }
@@ -39,7 +41,7 @@ public class ProcessUtil {
                         //Request Device Action
                         //Show device list here; give choice to user which device to pair
                         if (Protocol.isFindingDeviceToPair && (!isPairedDevice(map) || Protocol.connectionOption.isShowAlreadyConnected())) {
-                            Protocol.pairingProcessList.add(new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing));
+                            Protocol.pairingProcessList.add(device);
                             Process.onReceiveDeviceInfo(map);
                         }
                         break;
@@ -49,8 +51,12 @@ public class ProcessUtil {
                         //Show choice notification (or activity) to user whether user wants to pair this device with another one or not
                         if (Protocol.isListeningToPair && isTargetDevice(map)) {
                             for (PairDeviceInfo info : Protocol.pairingProcessList) {
-                                if (info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
-                                    Protocol.action.showPairChoiceAction(map, context);
+                                if (info.equals(device)) {
+                                    if(Protocol.connectionOption.isAllowRemovePairRemotely()) {
+                                        Process.registerDevice(device);
+                                    } else {
+                                        Protocol.action.showPairChoiceAction(map, context);
+                                    }
                                     break;
                                 }
                             }

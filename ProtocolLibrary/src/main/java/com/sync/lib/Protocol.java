@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.sync.lib.action.PairAction;
+import com.sync.lib.action.PairListener;
 import com.sync.lib.data.ConnectionOption;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.process.ProcessUtil;
@@ -19,7 +20,9 @@ import org.json.JSONObject;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import me.pushy.sdk.lib.jackson.databind.ObjectMapper;
 
@@ -31,6 +34,12 @@ public class Protocol {
     public static SharedPreferences pairPrefs;
     public static Context applicationContext;
     public static PairAction action;
+
+    static SharedPreferences.OnSharedPreferenceChangeListener onChange = ((sharedPreferences, key) -> {
+        if(key.equals("paired_list")) {
+            PairListener.m_onDeviceListChangedListener.onReceive(getPairedDeviceList());
+        }
+    });
 
     /**
      * initialize protocol
@@ -47,6 +56,7 @@ public class Protocol {
         if(connectionOption == null) connectionOption = new ConnectionOption();
         applicationContext = context;
         action = object;
+        pairPrefs.registerOnSharedPreferenceChangeListener(onChange);
     }
 
     /**
@@ -72,6 +82,20 @@ public class Protocol {
      */
     public static ArrayList<PairDeviceInfo> getPairingProcessList() {
         return pairingProcessList;
+    }
+
+    /**
+     * get list of current paired devices
+     * @return current ArrayList<PairDeviceInfo> object
+     */
+    public static ArrayList<PairDeviceInfo> getPairedDeviceList() {
+        Set<String> array = pairPrefs.getStringSet("paired_list", new HashSet<>());
+        ArrayList<PairDeviceInfo> list = new ArrayList<>();
+        for(String str : array) {
+            String[] data = str.split("\\|");
+            list.add(new PairDeviceInfo(data[0], data[1]));
+        }
+        return list;
     }
 
     /**

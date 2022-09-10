@@ -3,7 +3,6 @@ package com.sync.protocol.ui;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -32,12 +31,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sync.lib.Protocol;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ShareDataActivity extends AppCompatActivity {
@@ -64,11 +63,10 @@ public class ShareDataActivity extends AppCompatActivity {
         fileTooBigWarning.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         AtomicInteger deviceSelection = new AtomicInteger();
-        SharedPreferences pairPrefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
         ArrayList<String> nameList = new ArrayList<>();
-        ArrayList<String> rawList = new ArrayList<>(pairPrefs.getStringSet("paired_list", new HashSet<>()));
-        for (String str : rawList) {
-            nameList.add(str.split("\\|")[0]);
+        ArrayList<PairDeviceInfo> rawList = Protocol.getPairedDeviceList();
+        for (PairDeviceInfo device : rawList) {
+            nameList.add(device.getDevice_name());
         }
         deviceSelectSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, nameList));
         deviceSelectSpinner.setOnItemClickListener((parent, view, position, id) -> deviceSelection.set(position));
@@ -92,8 +90,7 @@ public class ShareDataActivity extends AppCompatActivity {
                     } else if (taskSelectSpinner.getText().toString().isEmpty()) {
                         deviceSelectSpinner.setError("Please select action to execute");
                     } else {
-                        String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                        DataUtils.requestAction(this, new PairDeviceInfo(array[0], array[1]), taskSelectSpinner.getText().toString(), data);
+                        DataUtils.requestAction(this, rawList.get(deviceSelection.get()), taskSelectSpinner.getText().toString(), data);
                         dialog.dismiss();
                     }
                 });
@@ -155,8 +152,7 @@ public class ShareDataActivity extends AppCompatActivity {
                                 completeDialog.setPositiveButton("Close", (dialogInterface, i) -> finish());
                                 completeDialog.show();
 
-                                String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                                DataUtils.requestAction(this, new PairDeviceInfo(array[0], array[1]), "Share file", name);
+                                DataUtils.requestAction(this, rawList.get(deviceSelection.get()), "Share file", name);
                             });
 
                             uploadTask.addOnProgressListener(snapshot -> {

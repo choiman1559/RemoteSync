@@ -18,26 +18,22 @@ import androidx.annotation.Nullable;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.kieronquinn.monetcompat.app.MonetCompatActivity;
 import com.kieronquinn.monetcompat.view.MonetSwitch;
+import com.sync.lib.Protocol;
+import com.sync.lib.action.PairListener;
+import com.sync.lib.data.PairDeviceInfo;
 import com.sync.protocol.R;
 import com.sync.protocol.ui.OptionActivity;
 import com.sync.protocol.ui.RequestActionActivity;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.Set;
 
 @SuppressLint("SetTextI18n")
 public class PairMainActivity extends MonetCompatActivity {
 
     SharedPreferences prefs;
-    SharedPreferences pairPrefs;
     LinearLayout deviceListLayout;
-
-    SharedPreferences.OnSharedPreferenceChangeListener onChange = ((sharedPreferences, key) -> {
-        if(key.equals("paired_list")) {
-            PairMainActivity.this.runOnUiThread(this::loadDeviceList);
-        }
-    });
+    PairListener.onDeviceListChangedListener onChange = (list -> PairMainActivity.this.runOnUiThread(this::loadDeviceList));
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,7 +45,6 @@ public class PairMainActivity extends MonetCompatActivity {
         TextView deviceNameInfo = findViewById(R.id.deviceNameInfo);
         MonetSwitch PairingSwitch = findViewById(R.id.PairingSwitch);
         deviceListLayout = findViewById(R.id.deviceListLayout);
-        pairPrefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
         prefs = getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE);
 
         deviceNameInfo.setText("Visible as \"" + Build.MODEL + "\" to other devices");
@@ -63,36 +58,35 @@ public class PairMainActivity extends MonetCompatActivity {
         PairingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> prefs.edit().putBoolean("ServiceToggle", isChecked).apply());
 
         loadDeviceList();
-        pairPrefs.registerOnSharedPreferenceChangeListener(onChange);
+        PairListener.setOnDeviceListChangedListener(onChange);
     }
 
     void loadDeviceList() {
-        Set<String> list = pairPrefs.getStringSet("paired_list", new HashSet<>());
+        ArrayList<PairDeviceInfo> list = Protocol.getPairedDeviceList();
         if(list.size() == deviceListLayout.getChildCount()) return;
         deviceListLayout.removeViews(0, deviceListLayout.getChildCount());
 
-        for(String string : list) {
-            String[] data = string.split("\\|");
+        for(PairDeviceInfo device : list) {
             RelativeLayout layout = (RelativeLayout) View.inflate(PairMainActivity.this, R.layout.cardview_pair_device_setting, null);
             Holder holder = new Holder(layout);
 
             String[] colorLow = PairMainActivity.this.getResources().getStringArray(R.array.material_color_low);
             String[] colorHigh = PairMainActivity.this.getResources().getStringArray(R.array.material_color_high);
-            int randomIndex = new Random(data[0].hashCode()).nextInt(colorHigh.length);
+            int randomIndex = new Random(device.getDevice_name().hashCode()).nextInt(colorHigh.length);
 
-            holder.deviceName.setText(data[0]);
+            holder.deviceName.setText(device.getDevice_name());
             holder.icon.setImageTintList(ColorStateList.valueOf(Color.parseColor(colorHigh[randomIndex])));
             holder.icon.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(colorLow[randomIndex])));
             holder.setting.setOnClickListener(v -> {
                 Intent intent = new Intent(this, PairDetailActivity.class);
-                intent.putExtra("device_name", data[0]);
-                intent.putExtra("device_id", data[1]);
+                intent.putExtra("device_name", device.getDevice_name());
+                intent.putExtra("device_id", device.getDevice_id());
                 startActivity(intent);
             });
             holder.baseLayout.setOnClickListener(v -> {
                 Intent intent = new Intent(this, RequestActionActivity.class);
-                intent.putExtra("device_name", data[0]);
-                intent.putExtra("device_id", data[1]);
+                intent.putExtra("device_name", device.getDevice_name());
+                intent.putExtra("device_id", device.getDevice_id());
                 startActivity(intent);
             });
 

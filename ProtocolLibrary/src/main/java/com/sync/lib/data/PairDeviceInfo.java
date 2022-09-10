@@ -1,5 +1,7 @@
 package com.sync.lib.data;
 
+import androidx.annotation.NonNull;
+
 public class PairDeviceInfo {
     /**
      * device name information
@@ -15,7 +17,7 @@ public class PairDeviceInfo {
      * device connection status information
      */
     @PairDeviceStatus.Status
-    private final int Device_status;
+    private int Device_status;
 
     public PairDeviceInfo(String Device_name, String Device_id, @PairDeviceStatus.Status int Device_status) {
         this.Device_id = Device_id;
@@ -39,5 +41,16 @@ public class PairDeviceInfo {
 
     public int getDevice_status() {
         return Device_status;
+    }
+
+    public PairDeviceInfo setDevice_status(@PairDeviceStatus.Status int Device_status) {
+        this.Device_status = Device_status;
+        return this;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return Device_name + "|" + Device_id;
     }
 }

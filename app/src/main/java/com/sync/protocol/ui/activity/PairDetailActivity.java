@@ -2,7 +2,6 @@ package com.sync.protocol.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,10 +27,8 @@ import com.sync.protocol.R;
 import com.sync.protocol.ui.ToastHelper;
 
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PairDetailActivity extends AppCompatActivity {
@@ -46,7 +43,6 @@ public class PairDetailActivity extends AppCompatActivity {
         String Device_name = intent.getStringExtra("device_name");
         String Device_id = intent.getStringExtra("device_id");
         PairDeviceInfo Device_info = new PairDeviceInfo(Device_name, Device_id);
-        SharedPreferences prefs = getSharedPreferences("com.sync.protocol_pair",MODE_PRIVATE);
 
         ImageView icon = findViewById(R.id.icon);
         ImageView batteryIcon = findViewById(R.id.batteryIcon);
@@ -71,9 +67,6 @@ public class PairDetailActivity extends AppCompatActivity {
 
         forgetButton.setOnClickListener(v -> {
             Process.requestRemovePair(this, Device_info);
-            Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
-            list.remove(Device_name + "|" + Device_id);
-            prefs.edit().putStringSet("paired_list", list).apply();
             finish();
         });
 

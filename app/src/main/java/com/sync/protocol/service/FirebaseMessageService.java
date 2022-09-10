@@ -28,12 +28,12 @@ import com.sync.protocol.utils.PowerUtils;
 
 public class FirebaseMessageService extends FirebaseMessagingService {
     SharedPreferences prefs;
-    SharedPreferences pairPrefs;
     private static PowerUtils manager;
     public static volatile Ringtone lastPlayedRingtone;
     public static final Thread ringtonePlayedThread = new Thread(() -> {
         while (true) {
-            if (lastPlayedRingtone != null && !lastPlayedRingtone.isPlaying()) lastPlayedRingtone.play();
+            if (lastPlayedRingtone != null && !lastPlayedRingtone.isPlaying())
+                lastPlayedRingtone.play();
         }
     });
     static FirebaseMessageService instance;
@@ -42,7 +42,6 @@ public class FirebaseMessageService extends FirebaseMessagingService {
     public void onCreate() {
         super.onCreate();
         prefs = getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE);
-        pairPrefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
         manager = PowerUtils.getInstance(this);
         manager.acquire();
         instance = this;

@@ -116,6 +116,7 @@ public class Process {
      */
     public static void responsePairAcceptation(PairDeviceInfo device, boolean isAccepted, Context context) {
         if (isAccepted) {
+            registerDevice(device);
             for (PairDeviceInfo info : Protocol.pairingProcessList) {
                 if (info.getDevice_name().equals(device.getDevice_name()) && info.getDevice_id().equals(device.getDevice_id())) {
                     Protocol.isListeningToPair = false;
@@ -143,6 +144,24 @@ public class Process {
         }
 
         DataUtils.sendNotification(notificationHead, "pair.func", context);
+    }
+
+    protected static void registerDevice(PairDeviceInfo device) {
+        boolean isNotRegistered = true;
+        String dataToSave = device.toString();
+
+        Set<String> list = new HashSet<>(Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>()));
+        for(String str : list) {
+            if(str.equals(dataToSave)) {
+                isNotRegistered = false;
+                break;
+            }
+        }
+
+        if(isNotRegistered) {
+            list.add(dataToSave);
+            Protocol.pairPrefs.edit().putStringSet("paired_list", list).apply();
+        }
     }
 
     /**
@@ -196,6 +215,10 @@ public class Process {
      * @param context android context instance
      */
     public static void requestRemovePair(Context context, PairDeviceInfo device) {
+        Set<String> list = new HashSet<>(Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>()));
+        list.remove(device.getDevice_name() + "|" + device.getDevice_id());
+        Protocol.pairPrefs.edit().putStringSet("paired_list", list).apply();
+
         String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
         JSONObject notificationHead = new JSONObject();
         JSONObject notificationBody = new JSONObject();

@@ -3,7 +3,6 @@ package com.sync.protocol.ui.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Html;
 import android.widget.TextView;
@@ -16,9 +15,6 @@ import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.process.Process;
 import com.sync.protocol.R;
 import com.sync.protocol.ui.ExitActivity;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class PairAcceptActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
@@ -36,25 +32,7 @@ public class PairAcceptActivity extends AppCompatActivity {
         TextView info = findViewById(R.id.notiDetail);
         info.setText(Html.fromHtml("Are you sure you want to grant the pairing request?<br><b>Requested Device:</b> " + Device_name));
 
-        AcceptButton.setOnClickListener(v -> {
-            sendAcceptedMessage(Device_name, Device_id, true, this);
-            SharedPreferences prefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
-            boolean isNotRegistered = true;
-            String dataToSave = Device_name + "|" + Device_id;
-
-            Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
-            for(String str : list) {
-                if(str.equals(dataToSave)) {
-                    isNotRegistered = false;
-                    break;
-                }
-            }
-
-            if(isNotRegistered) {
-                list.add(dataToSave);
-                prefs.edit().putStringSet("paired_list", list).apply();
-            }
-        });
+        AcceptButton.setOnClickListener(v -> sendAcceptedMessage(Device_name, Device_id, true, this));
         CancelButton.setOnClickListener(v -> sendAcceptedMessage(Device_name, Device_id, false, this));
     }
 

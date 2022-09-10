@@ -24,7 +24,7 @@ public class JsonRequest {
      * @param context Android application class context
      * @return A JsonRequest instance.
      */
-    public static synchronized JsonRequest getInstance(Context context) {
+    protected static synchronized JsonRequest getInstance(Context context) {
         if (instance == null) {
             instance = new JsonRequest(context);
         }
@@ -36,7 +36,7 @@ public class JsonRequest {
      *
      * @return A started RequestQueue instance.
      */
-    public RequestQueue getRequestQueue() {
+    protected RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
         }
@@ -48,7 +48,7 @@ public class JsonRequest {
      * @param req Json request instance to query
      * @param <T> object type
      */
-    public <T> void addToRequestQueue(Request<T> req) {
+    protected <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
 }
