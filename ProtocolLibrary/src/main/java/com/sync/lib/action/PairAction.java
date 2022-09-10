@@ -2,12 +2,15 @@ package com.sync.lib.action;
 
 import android.content.Context;
 
+import com.sync.lib.data.Data;
+import com.sync.lib.data.PairDeviceInfo;
+
 import java.util.Map;
 
 public class PairAction {
     public void onFindRequest() {}
-    public void onActionRequested(Map<String, String> map, Context context) {}
-    public void onDataRequested(Map<String, String> map, Context context) {}
-    public void showPairChoiceAction(Map<String, String> map, Context context) {}
-    public void onPairRemoved(Map<String, String> map) {}
+    public void onActionRequested(Data map, Context context) {}
+    public void onDataRequested(Data map, Context context) {}
+    public void showPairChoiceAction(Data map, Context context) {}
+    public void onPairRemoved(PairDeviceInfo device) {}
 }

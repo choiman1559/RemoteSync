@@ -1,24 +1,22 @@
 package com.sync.lib.process;
 
-import static android.content.Context.MODE_PRIVATE;
 import static com.sync.lib.action.PairListener.m_onDeviceFoundListener;
 import static com.sync.lib.action.PairListener.m_onDevicePairResultListener;
 import static com.sync.lib.util.DataUtils.sendNotification;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.util.Log;
 
 import com.sync.lib.Protocol;
+import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.data.Value;
 import com.sync.lib.util.DataUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Process {
@@ -29,20 +27,16 @@ public class Process {
      */
     public static void requestDeviceListWidely(Context context) {
         Protocol.isFindingDeviceToPair = true;
-        String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
-        JSONObject notificationHead = new JSONObject();
         JSONObject notificationBody = new JSONObject();
+
         try {
-            notificationBody.put("type", "pair|request_device_list");
-            notificationBody.put("device_name", Build.MANUFACTURER + " " + Build.MODEL);
-            notificationBody.put("device_id", Protocol.getConnectionOption().getIdentifierValue());
-            notificationHead.put("to", Topic);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
+            notificationBody.put(Value.TYPE.id(), "pair|request_device_list");
+            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        sendNotification(notificationHead, "pair.func", context, true);
+        sendNotification(notificationBody, "pair.func", context, true);
         if (isShowDebugLog()) Log.d("sync sent", "request list: " + notificationBody);
     }
 
@@ -52,23 +46,20 @@ public class Process {
      * @param map Raw data from FCM
      * @param context android context instance
      */
-    public static void responseDeviceInfoToFinder(Map<String, String> map, Context context) {
-        String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
-        JSONObject notificationHead = new JSONObject();
+    public static void responseDeviceInfoToFinder(Data map, Context context) {
         JSONObject notificationBody = new JSONObject();
+        PairDeviceInfo device = map.getDevice();
+
         try {
-            notificationBody.put("type", "pair|response_device_list");
-            notificationBody.put("device_name", Build.MANUFACTURER + " " + Build.MODEL);
-            notificationBody.put("device_id", Protocol.getConnectionOption().getIdentifierValue());
-            notificationBody.put("send_device_name", map.get("device_name"));
-            notificationBody.put("send_device_id", map.get("device_id"));
-            notificationHead.put("to", Topic);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
+            notificationBody.put(Value.TYPE.id(), "pair|response_device_list");
+            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
+            notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        sendNotification(notificationHead, "pair.func", context);
+        sendNotification(notificationBody, "pair.func", context);
         if (isShowDebugLog()) Log.d("sync sent", "response list: " + notificationBody);
     }
 
@@ -77,7 +68,7 @@ public class Process {
      *
      * @param map Raw data from FCM
      */
-    public static void onReceiveDeviceInfo(Map<String, String> map) {
+    public static void onReceiveDeviceInfo(Data map) {
         if (m_onDeviceFoundListener != null) m_onDeviceFoundListener.onReceive(map);
     }
 
@@ -88,22 +79,17 @@ public class Process {
      * @param context android context instance
      */
     public static void requestPair(PairDeviceInfo device, Context context) {
-        String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
-        JSONObject notificationHead = new JSONObject();
         JSONObject notificationBody = new JSONObject();
         try {
-            notificationBody.put("type", "pair|request_pair");
-            notificationBody.put("device_name", Build.MANUFACTURER + " " + Build.MODEL);
-            notificationBody.put("device_id", Protocol.getConnectionOption().getIdentifierValue());
-            notificationBody.put("send_device_name", device.getDevice_name());
-            notificationBody.put("send_device_id", device.getDevice_id());
-            notificationHead.put("to", Topic);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
+            notificationBody.put(Value.TYPE.id(), "pair|request_pair");
+            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
+            notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        sendNotification(notificationHead, "pair.func", context);
+        sendNotification(notificationBody, "pair.func", context);
         if (isShowDebugLog()) Log.d("sync sent", "request pair: " + notificationBody);
     }
 
@@ -126,26 +112,26 @@ public class Process {
             }
         }
 
-        String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
-        JSONObject notificationHead = new JSONObject();
         JSONObject notificationBody = new JSONObject();
         try {
-            notificationBody.put("type", "pair|accept_pair");
-            notificationBody.put("device_name", Build.MANUFACTURER + " " + Build.MODEL);
-            notificationBody.put("device_id", Protocol.getConnectionOption().getIdentifierValue());
-            notificationBody.put("send_device_name", device.getDevice_name());
-            notificationBody.put("send_device_id", device.getDevice_id());
-            notificationBody.put("pair_accept", isAccepted ? "true" : "false");
-            notificationHead.put("to", Topic);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
+            notificationBody.put(Value.TYPE.id(), "pair|accept_pair");
+            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
+            notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
+            notificationBody.put(Value.PAIR_ACCEPT.id(), isAccepted ? "true" : "false");
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
 
-        DataUtils.sendNotification(notificationHead, "pair.func", context);
+        DataUtils.sendNotification(notificationBody, "pair.func", context);
     }
 
+    /**
+     * Save device name and id value to preferences
+     *
+     * @param device target device to save in preferences
+     */
     protected static void registerDevice(PairDeviceInfo device) {
         boolean isNotRegistered = true;
         String dataToSave = device.toString();
@@ -169,28 +155,11 @@ public class Process {
      *
      * @param info target device to response pair
      * @param map Raw data from FCM
-     * @param context android context instance
      */
-    public static void checkPairResultAndRegister(Map<String, String> map, PairDeviceInfo info, Context context) {
+    public static void checkPairResultAndRegister(Data map, PairDeviceInfo info) {
         if (m_onDevicePairResultListener != null) m_onDevicePairResultListener.onReceive(map);
-        if ("true".equals(map.get("pair_accept"))) {
-            SharedPreferences prefs = context.getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
-            boolean isNotRegistered = true;
-            String dataToSave = map.get("device_name") + "|" + map.get("device_id");
-
-            Set<String> list = new HashSet<>(prefs.getStringSet("paired_list", new HashSet<>()));
-            for(String str : list) {
-                if(str.equals(dataToSave)) {
-                    isNotRegistered = false;
-                    break;
-                }
-            }
-
-            if(isNotRegistered) {
-                list.add(dataToSave);
-                prefs.edit().putStringSet("paired_list", list).apply();
-            }
-
+        if ("true".equals(map.get(Value.PAIR_ACCEPT))) {
+            registerDevice(info);
             Protocol.isFindingDeviceToPair = false;
             Protocol.pairingProcessList.remove(info);
         }
@@ -199,13 +168,14 @@ public class Process {
     /**
      * Device information will be deleted from this device when requested to unpair.
      *
-     * @param map Raw data from FCM
+     * @param device Device to delete
+     * @param haveToAnnounce Set whether call "onPairRemoved" listener after delete device
      */
-    public static void removePairedDevice(Map<String, String> map) {
+    public static void removePairedDevice(PairDeviceInfo device, boolean haveToAnnounce) {
         Set<String> list = new HashSet<>(Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>()));
-        list.remove(map.get("device_name") + "|" + map.get("device_id"));
+        list.remove(device.toString());
         Protocol.pairPrefs.edit().putStringSet("paired_list", list).apply();
-        Protocol.action.onPairRemoved(map);
+        if(haveToAnnounce) Protocol.action.onPairRemoved(device);
     }
 
     /**
@@ -215,26 +185,19 @@ public class Process {
      * @param context android context instance
      */
     public static void requestRemovePair(Context context, PairDeviceInfo device) {
-        Set<String> list = new HashSet<>(Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>()));
-        list.remove(device.getDevice_name() + "|" + device.getDevice_id());
-        Protocol.pairPrefs.edit().putStringSet("paired_list", list).apply();
-
-        String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
-        JSONObject notificationHead = new JSONObject();
+        removePairedDevice(device, false);
         JSONObject notificationBody = new JSONObject();
+
         try {
-            notificationBody.put("type", "pair|request_remove");
-            notificationBody.put("device_name", Build.MANUFACTURER + " " + Build.MODEL);
-            notificationBody.put("device_id", Protocol.getConnectionOption().getIdentifierValue());
-            notificationBody.put("send_device_name", device.getDevice_name());
-            notificationBody.put("send_device_id", device.getDevice_id());
-            notificationHead.put("to", Topic);
-            notificationHead.put("priority", "high");
-            notificationHead.put("data", notificationBody);
+            notificationBody.put(Value.TYPE.id(), "pair|request_remove");
+            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
+            notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
-        sendNotification(notificationHead, "pair.func", context);
+        sendNotification(notificationBody, "pair.func", context);
         if (isShowDebugLog()) Log.d("sync sent", "request remove: " + notificationBody);
     }
 

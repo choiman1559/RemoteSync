@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,7 +12,9 @@ import androidx.annotation.NonNull;
 import com.sync.lib.action.PairAction;
 import com.sync.lib.action.PairListener;
 import com.sync.lib.data.ConnectionOption;
+import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.data.Value;
 import com.sync.lib.process.ProcessUtil;
 import com.sync.lib.util.AESCrypto;
 import com.sync.lib.util.CompressStringUtil;
@@ -34,6 +37,7 @@ public class Protocol {
     public static SharedPreferences pairPrefs;
     public static Context applicationContext;
     public static PairAction action;
+    public static PairDeviceInfo thisDevice;
 
     static SharedPreferences.OnSharedPreferenceChangeListener onChange = ((sharedPreferences, key) -> {
         if(key.equals("paired_list")) {
@@ -56,6 +60,7 @@ public class Protocol {
         if(connectionOption == null) connectionOption = new ConnectionOption();
         applicationContext = context;
         action = object;
+        thisDevice = new PairDeviceInfo(Build.MANUFACTURER + " " + Build.MODEL, connectionOption.getIdentifierValue());
         pairPrefs.registerOnSharedPreferenceChangeListener(onChange);
     }
 
@@ -66,6 +71,7 @@ public class Protocol {
      */
     public static void setConnectionOption(ConnectionOption connectionOption) {
         Protocol.connectionOption = connectionOption;
+        thisDevice = new PairDeviceInfo(Build.MANUFACTURER + " " + Build.MODEL, connectionOption.getIdentifierValue());
     }
 
     /**
@@ -101,23 +107,29 @@ public class Protocol {
     /**
      * When the data received from FCM is passed to this function, the protocol starts processing
      *
-     * @param map Raw data from FCM
+     * @param rawMap Raw data from FCM
      */
     @SuppressWarnings("unchecked")
-    public static void onMessageReceived(@NonNull Map<String, String> map) {
-        if ("true".equals(map.get("encrypted"))) {
+    public static void onMessageReceived(@NonNull Map<String, String> rawMap) {
+        Data map = new Data(rawMap);
+        if ("true".equals(map.get(Value.ENCRYPTED))) {
             if (connectionOption.isEncryptionEnabled() && !connectionOption.getEncryptionPassword().equals("")) {
                 try {
                     JSONObject object;
+                    boolean isFirstFetch = "true".equals(map.get(Value.IS_FIRST_FETCHED));
+                    if(!isFirstFetch && !thisDevice.getDevice_name().equals(map.get(Value.SEND_DEVICE_NAME))) {
+                        return;
+                    }
+
                     if(connectionOption.isAuthWithHMac()) {
-                        String hashKey = "true".equals(map.get("isFirstFetch")) ? Protocol.connectionOption.getPairingKey() : Protocol.connectionOption.getIdentifierValue();
-                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword(), hashKey));
+                        String hashKey = isFirstFetch ? Protocol.connectionOption.getPairingKey() : Protocol.connectionOption.getIdentifierValue();
+                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), connectionOption.getEncryptionPassword(), hashKey));
                     } else {
-                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get("encryptedData")), connectionOption.getEncryptionPassword()));
+                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), connectionOption.getEncryptionPassword()));
                     }
 
                     Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
-                    ProcessUtil.processReception(newMap, applicationContext);
+                    ProcessUtil.processReception(new Data(newMap), applicationContext);
                 } catch (GeneralSecurityException e) {
                     Log.e("SyncProtocol", "Error occurred while decrypting data!\nCause: " + e.getMessage());
                 } catch (Exception e) {

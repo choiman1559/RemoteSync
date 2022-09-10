@@ -27,6 +27,7 @@ public class Application extends android.app.Application {
         option.setDenyFindRequest(prefs.getBoolean("NotReceiveFindDevice", false));
         option.setShowAlreadyConnected(prefs.getBoolean("showAlreadyConnected", false));
         option.setAllowRemovePairRemotely(prefs.getBoolean("allowRemovePairRemotely", true));
+        option.setAllowAcceptPairAutomatically(prefs.getBoolean("allowAcceptPairAutomatically", false));
         option.setAuthWithHMac(prefs.getBoolean("UseAuthWithHMac", false));
         option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
 

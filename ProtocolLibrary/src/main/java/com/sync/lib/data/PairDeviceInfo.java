@@ -2,6 +2,8 @@ package com.sync.lib.data;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class PairDeviceInfo {
     /**
      * device name information
@@ -52,5 +54,18 @@ public class PairDeviceInfo {
     @Override
     public String toString() {
         return Device_name + "|" + Device_id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PairDeviceInfo that = (PairDeviceInfo) o;
+        return Objects.equals(Device_name, that.Device_name) && Objects.equals(Device_id, that.Device_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Device_name, Device_id);
     }
 }

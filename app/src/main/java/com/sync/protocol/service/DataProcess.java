@@ -32,7 +32,9 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.data.Value;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
 import com.sync.protocol.ui.activity.PairAcceptActivity;
@@ -45,13 +47,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class DataProcess {
-    public static void onDataRequested(Map<String, String> map, Context context) {
-        String dataType = map.get("request_data");
+    public static void onDataRequested(Data map, Context context) {
+        String dataType = map.get(Value.REQUEST_DATA);
         String dataToSend = "";
         if (dataType != null) {
             switch (dataType) {
@@ -77,16 +77,15 @@ public class DataProcess {
         }
 
         if (!dataToSend.isEmpty()) {
-            DataUtils.responseDataRequest(new PairDeviceInfo(map.get("device_name"), map.get("device_id")), dataType, dataToSend, context);
+            DataUtils.responseDataRequest(map.getDevice(), dataType, dataToSend, context);
         }
     }
 
-    public static void onActionRequested(Map<String, String> map, Context context) {
+    public static void onActionRequested(Data map, Context context) {
         PowerUtils.getInstance(context).acquire();
-        String Device_id = map.get("device_id");
-        String Device_name = map.get("device_name");
-        String actionType = map.get("request_action");
-        String actionArg = map.get("action_args");
+        PairDeviceInfo device = map.getDevice();
+        String actionType = map.get(Value.REQUEST_ACTION);
+        String actionArg = map.get(Value.ACTION_ARGS);
         String[] actionArgs = {};
 
         if (actionArg != null) {
@@ -111,7 +110,7 @@ public class DataProcess {
 
                 case "Copy text to clipboard":
                     ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("Shared from " + Device_name, actionArgs[0]);
+                    ClipData clip = ClipData.newPlainText("Shared from " + device.getDevice_name(), actionArgs[0]);
                     clipboard.setPrimaryClip(clip);
                     break;
 
@@ -124,13 +123,11 @@ public class DataProcess {
                     break;
 
                 case "Trigger tasker event":
-                    if (Device_name != null && Device_id != null) {
-                        TaskerPairEventKt.callTaskerEvent(Device_name, Device_id, context);
-                    }
+                    TaskerPairEventKt.callTaskerEvent(device.getDevice_name(), device.getDevice_id(), context);
                     break;
 
                 case "Run application":
-                    new Handler(Looper.getMainLooper()).postDelayed(() -> Toast.makeText(context, "Remote run by SyncProtocol\nfrom " + map.get("device_name"), Toast.LENGTH_SHORT).show(), 0);
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> Toast.makeText(context, "Remote run by SyncProtocol\nfrom " + device.getDevice_name(), Toast.LENGTH_SHORT).show(), 0);
                     String Package = actionArgs[0].trim();
                     try {
                         PackageManager pm = context.getPackageManager();
@@ -279,12 +276,13 @@ public class DataProcess {
         }
     }
 
-    public static void showPairChoiceAction(Map<String, String> map, Context context) {
+    public static void showPairChoiceAction(Data map, Context context) {
         int uniqueCode = (int) (Calendar.getInstance().getTime().getTime() / 1000L % Integer.MAX_VALUE);
+        PairDeviceInfo device = map.getDevice();
 
         Intent notificationIntent = new Intent(context, PairAcceptActivity.class);
-        notificationIntent.putExtra("device_name", map.get("device_name"));
-        notificationIntent.putExtra("device_id", map.get("device_id"));
+        notificationIntent.putExtra("device_name", device.getDevice_name());
+        notificationIntent.putExtra("device_id", device.getDevice_id());
 
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, uniqueCode, notificationIntent, Build.VERSION.SDK_INT > 30 ? PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT);

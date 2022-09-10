@@ -19,6 +19,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.PairDeviceStatus;
 import com.sync.lib.action.PairListener;
+import com.sync.lib.data.Value;
 import com.sync.lib.process.Process;
 import com.sync.protocol.R;
 import com.sync.protocol.utils.DataUtils;
@@ -46,7 +47,7 @@ public class PairingActivity extends AppCompatActivity {
         deviceListLayout = findViewById(R.id.deviceListLayout);
 
         PairListener.setOnDeviceFoundListener(map -> PairingActivity.this.runOnUiThread(() -> {
-            PairDeviceInfo device = new PairDeviceInfo(map.get("device_name"), map.get("device_id"));
+            PairDeviceInfo device = map.getDevice();
             if(device.getDevice_name() != null && device.getDevice_id() != null) {
                 boolean isDeviceNotQueried = true;
                 for(PairDeviceInfo info : infoList) {
@@ -66,14 +67,14 @@ public class PairingActivity extends AppCompatActivity {
         PairListener.setOnDevicePairResultListener(map -> {
             for(int i = 0;i < infoList.size(); i++) {
                 PairDeviceInfo info = infoList.get(i);
-                PairDeviceInfo device = new PairDeviceInfo(map.get("device_name"), map.get("device_id"));
+                PairDeviceInfo device = map.getDevice();
 
                 if(info.equals(device)) {
                     int finalI = i;
                     PairingActivity.this.runOnUiThread(() -> {
                         RelativeLayout view = (RelativeLayout) deviceListLayout.getChildAt(finalI);
                         Holder holder = new Holder(view);
-                        if("false".equals(map.get("pair_accept"))) {
+                        if("false".equals(map.get(Value.PAIR_ACCEPT))) {
                             holder.pairStatus.setText("Failed");
                         } else PairingActivity.this.finish();
                     });

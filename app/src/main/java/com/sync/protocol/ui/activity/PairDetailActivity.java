@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.sync.lib.action.PairListener;
 import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.data.Value;
 import com.sync.lib.process.Process;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
@@ -75,37 +76,6 @@ public class PairDetailActivity extends AppCompatActivity {
             ToastHelper.show(this, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
         });
 
-        DataUtils.requestData(this, Device_info, "battery_info");
-        PairListener.addOnDataReceivedListener(map -> {
-            if(Objects.equals(map.get("request_data"), "battery_info") &&
-                    Objects.equals(map.get("device_name"), Device_name) &&
-                    Objects.equals(map.get("device_id"), Device_id)) {
-                String[] data = Objects.requireNonNull(map.get("receive_data")).split("\\|");
-                int batteryInt = data[0].equals("undefined") ? 0 : Integer.parseInt(data[0]);
-                int resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_warning_24_regular;
-
-                if(batteryInt < 10) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_0_24_regular;
-                else if(batteryInt < 20) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_1_24_regular;
-                else if(batteryInt < 30) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_2_24_regular;
-                else if(batteryInt < 40) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_3_24_regular;
-                else if(batteryInt < 50) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_4_24_regular;
-                else if(batteryInt < 60) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_5_24_regular;
-                else if(batteryInt < 70) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_6_24_regular;
-                else if(batteryInt < 80) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_7_24_regular;
-                else if(batteryInt < 90) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_8_24_regular;
-                else if(batteryInt < 100) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_9_24_regular;
-                else if(batteryInt == 100) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_10_24_regular;
-
-                int finalResId = resId;
-                PairDetailActivity.this.runOnUiThread(() -> {
-                    if(data[2].equals("true")) batterySaveEnabled.setVisibility(View.VISIBLE);
-                    batteryLayout.setVisibility(View.VISIBLE);
-                    batteryDetail.setText(data[0] + "% remaining" + (data[1].equals("true") ? ", Charging" : ""));
-                    batteryIcon.setImageDrawable(AppCompatResources.getDrawable(PairDetailActivity.this, finalResId));
-                });
-            }
-        });
-
         AtomicLong currentTime = new AtomicLong();
         testSpeedLayout.setVisibility(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("printDebugLog", false) ? View.VISIBLE : View.GONE);
         testSpeedLayout.setOnClickListener((v) -> {
@@ -114,24 +84,53 @@ public class PairDetailActivity extends AppCompatActivity {
         });
 
         PairListener.addOnDataReceivedListener(map -> {
-            if(Objects.equals(map.get("request_data"), "speed_test") &&
-                    Objects.equals(map.get("device_name"), Device_name) &&
-                    Objects.equals(map.get("device_id"), Device_id)) {
-                final long receivedTime = Long.parseLong(Objects.requireNonNull(map.get("receive_data")));
-                final long arrivalTime = Calendar.getInstance().getTimeInMillis();
+            if(Device_info.equals(map.getDevice())) {
+                switch (map.get(Value.REQUEST_DATA)) {
+                    case "speed_test":
+                        final long receivedTime = Long.parseLong(Objects.requireNonNull(map.get(Value.RECEIVE_DATA)));
+                        final long arrivalTime = Calendar.getInstance().getTimeInMillis();
 
-                PairDetailActivity.this.runOnUiThread(() -> {
-                    MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(new ContextThemeWrapper(PairDetailActivity.this, R.style.MaterialAlertDialog_Material3));
-                    dialog.setTitle("Test result");
-                    dialog.setMessage("Send -> Receive: " + (receivedTime - currentTime.get()) + "\nReceive -> Send: " + (arrivalTime - receivedTime) + "\nTotal: " + (arrivalTime - currentTime.get()));
-                    dialog.setIcon(R.drawable.ic_info_outline_black_24dp);
-                    dialog.setPositiveButton("Close", (d, w) -> {});
-                    dialog.show();
-                });
+                        PairDetailActivity.this.runOnUiThread(() -> {
+                            MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(new ContextThemeWrapper(PairDetailActivity.this, R.style.MaterialAlertDialog_Material3));
+                            dialog.setTitle("Test result");
+                            dialog.setMessage("Send -> Receive: " + (receivedTime - currentTime.get()) + "\nReceive -> Send: " + (arrivalTime - receivedTime) + "\nTotal: " + (arrivalTime - currentTime.get()));
+                            dialog.setIcon(R.drawable.ic_info_outline_black_24dp);
+                            dialog.setPositiveButton("Close", (d, w) -> {});
+                            dialog.show();
+                        });
+                        break;
+
+                    case "battery_info":
+                        String[] data = Objects.requireNonNull(map.get(Value.RECEIVE_DATA)).split("\\|");
+                        int batteryInt = data[0].equals("undefined") ? 0 : Integer.parseInt(data[0]);
+                        int resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_warning_24_regular;
+
+                        if(batteryInt < 10) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_0_24_regular;
+                        else if(batteryInt < 20) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_1_24_regular;
+                        else if(batteryInt < 30) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_2_24_regular;
+                        else if(batteryInt < 40) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_3_24_regular;
+                        else if(batteryInt < 50) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_4_24_regular;
+                        else if(batteryInt < 60) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_5_24_regular;
+                        else if(batteryInt < 70) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_6_24_regular;
+                        else if(batteryInt < 80) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_7_24_regular;
+                        else if(batteryInt < 90) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_8_24_regular;
+                        else if(batteryInt < 100) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_9_24_regular;
+                        else if(batteryInt == 100) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_10_24_regular;
+
+                        int finalResId = resId;
+                        PairDetailActivity.this.runOnUiThread(() -> {
+                            if(data[2].equals("true")) batterySaveEnabled.setVisibility(View.VISIBLE);
+                            batteryLayout.setVisibility(View.VISIBLE);
+                            batteryDetail.setText(data[0] + "% remaining" + (data[1].equals("true") ? ", Charging" : ""));
+                            batteryIcon.setImageDrawable(AppCompatResources.getDrawable(PairDetailActivity.this, finalResId));
+                        });
+                        break;
+                }
             }
         });
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener((v) -> this.finish());
+        DataUtils.requestData(this, Device_info, "battery_info");
     }
 }

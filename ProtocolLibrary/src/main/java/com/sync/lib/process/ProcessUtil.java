@@ -1,13 +1,14 @@
 package com.sync.lib.process;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 
 import com.sync.lib.Protocol;
 import com.sync.lib.action.PairListener;
+import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.PairDeviceStatus;
+import com.sync.lib.data.Value;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -19,13 +20,13 @@ public class ProcessUtil {
      * @param context Android application class context
      * @param map Custom class that extends PairAction Listener to get action requested from protocol
      */
-    public static void processReception(Map<String, String> map, Context context) {
-        String type = map.get("type");
-        if(Protocol.connectionOption.isPrintDebugLog()) Log.d("SyncProtocol", type + "Sent device: " + map.get("device_name") + map.get("device_id"));
+    public static void processReception(Data map, Context context) {
+        String type = map.get(Value.TYPE);
+
+        if(Protocol.connectionOption.isPrintDebugLog()) Log.d("SyncProtocol", type + " Sent device: " + map.getDevice().toString());
         if (type != null && !Protocol.connectionOption.getPairingKey().equals("")) {
             if (type.startsWith("pair") && !isDeviceItself(map)) {
-                PairDeviceInfo device = new PairDeviceInfo(map.get("device_name"), map.get("device_id"), PairDeviceStatus.Device_Process_Pairing);
-
+                PairDeviceInfo device = new PairDeviceInfo(map.get(Value.DEVICE_NAME), map.get(Value.DEVICE_ID), PairDeviceStatus.Device_Process_Pairing);
                 switch (type) {
                     case "pair|request_device_list":
                         //Target Device action
@@ -52,8 +53,8 @@ public class ProcessUtil {
                         if (Protocol.isListeningToPair && isTargetDevice(map)) {
                             for (PairDeviceInfo info : Protocol.pairingProcessList) {
                                 if (info.equals(device)) {
-                                    if(Protocol.connectionOption.isAllowRemovePairRemotely()) {
-                                        Process.registerDevice(device);
+                                    if(Protocol.connectionOption.isAllowAcceptPairAutomatically()) {
+                                        Process.responsePairAcceptation(device, true, context);
                                     } else {
                                         Protocol.action.showPairChoiceAction(map, context);
                                     }
@@ -68,8 +69,8 @@ public class ProcessUtil {
                         //Check if target accepted to pair and process result here
                         if (Protocol.isFindingDeviceToPair && isTargetDevice(map)) {
                             for (PairDeviceInfo info : Protocol.pairingProcessList) {
-                                if (info.getDevice_name().equals(map.get("device_name")) && info.getDevice_id().equals(map.get("device_id"))) {
-                                    Process.checkPairResultAndRegister(map, info, context);
+                                if (info.equals(map.getDevice())) {
+                                    Process.checkPairResultAndRegister(map, info);
                                     break;
                                 }
                             }
@@ -78,7 +79,7 @@ public class ProcessUtil {
 
                     case "pair|request_remove":
                         if(isTargetDevice(map) && isPairedDevice(map) && Protocol.connectionOption.isAllowRemovePairRemotely()) {
-                            Process.removePairedDevice(map);
+                            Process.removePairedDevice(device, true);
                         }
                         break;
 
@@ -118,19 +119,16 @@ public class ProcessUtil {
      *
      * @param map raw data received from push server
      */
-    protected static boolean isDeviceItself(Map<String, String> map) {
-        String Device_name = map.get("device_name");
-        String Device_id = map.get("device_id");
+    protected static boolean isDeviceItself(Data map) {
+        String Device_name = map.get(Value.DEVICE_NAME);
+        String Device_id = map.get(Value.DEVICE_ID);
 
         if (Device_id == null || Device_name == null) {
-            Device_id = map.get("send_device_id");
-            Device_name = map.get("send_device_name");
+            Device_id = map.get(Value.SEND_DEVICE_ID);
+            Device_name = map.get(Value.SEND_DEVICE_NAME);
         }
 
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = Protocol.connectionOption.getIdentifierValue();
-
-        return DEVICE_NAME.equals(Device_name) && DEVICE_ID.equals(Device_id);
+        return Protocol.thisDevice.equals(new PairDeviceInfo(Device_name, Device_id));
     }
 
     /**
@@ -138,14 +136,11 @@ public class ProcessUtil {
      *
      * @param map raw data received from push server
      */
-    protected static boolean isTargetDevice(Map<String, String> map) {
-        String Device_name = map.get("send_device_name");
-        String Device_id = map.get("send_device_id");
+    protected static boolean isTargetDevice(Data map) {
+        String Device_name = map.get(Value.SEND_DEVICE_NAME);
+        String Device_id = map.get(Value.SEND_DEVICE_ID);
 
-        String DEVICE_NAME = Build.MANUFACTURER + " " + Build.MODEL;
-        String DEVICE_ID = Protocol.connectionOption.getIdentifierValue();
-
-        return DEVICE_NAME.equals(Device_name) && DEVICE_ID.equals(Device_id);
+        return Protocol.thisDevice.equals(new PairDeviceInfo(Device_name, Device_id));
     }
 
     /**
@@ -153,8 +148,8 @@ public class ProcessUtil {
      *
      * @param map raw data received from push server
      */
-    protected static boolean isPairedDevice(Map<String, String> map) {
-        String dataToFind = map.get("device_name") + "|" + map.get("device_id");
+    protected static boolean isPairedDevice(Data map) {
+        String dataToFind = map.getDevice().toString();
         for (String str : Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>())) {
             if (str.equals(dataToFind)) return true;
         }

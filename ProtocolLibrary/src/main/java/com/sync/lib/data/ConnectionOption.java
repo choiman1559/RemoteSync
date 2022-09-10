@@ -9,6 +9,7 @@ public class ConnectionOption {
     private boolean showAlreadyConnected;
     private boolean isReceiveFindRequest;
     private boolean allowRemovePairRemotely;
+    private boolean allowAcceptPairAutomatically;
     private boolean authWithHMac;
     private String serverKey;
 
@@ -18,6 +19,7 @@ public class ConnectionOption {
         showAlreadyConnected = false;
         isReceiveFindRequest = false;
         authWithHMac = false;
+        allowAcceptPairAutomatically = false;
         pairingKey = "";
         identifierValue = "";
         encryptionPassword = "";
@@ -58,6 +60,10 @@ public class ConnectionOption {
 
     public void setAllowRemovePairRemotely(boolean allowRemovePairRemotely) {
         this.allowRemovePairRemotely = allowRemovePairRemotely;
+    }
+
+    public void setAllowAcceptPairAutomatically(boolean allowAcceptPairAutomatically) {
+        this.allowAcceptPairAutomatically = allowAcceptPairAutomatically;
     }
 
     public boolean isEncryptionEnabled() {
@@ -102,5 +108,9 @@ public class ConnectionOption {
 
     public boolean isAllowRemovePairRemotely() {
         return allowRemovePairRemotely;
+    }
+
+    public boolean isAllowAcceptPairAutomatically() {
+        return allowAcceptPairAutomatically;
     }
 }

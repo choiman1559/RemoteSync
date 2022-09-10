@@ -1,5 +1,6 @@
 package com.sync.lib.action;
 
+import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 
 import java.util.ArrayList;
@@ -12,21 +13,20 @@ final public class PairListener {
     public static ArrayList<onDataReceivedListener> m_onDataReceivedListener = new ArrayList<>();
 
     public interface onDeviceFoundListener {
-        void onReceive(Map<String, String> map);
+        void onReceive(Data map);
     }
 
     public interface onDevicePairResultListener {
-        void onReceive(Map<String, String> map);
+        void onReceive(Data map);
     }
 
     public interface onDataReceivedListener {
-        void onReceive(Map<String, String> map);
+        void onReceive(Data map);
     }
 
     public interface onDeviceListChangedListener {
         void onReceive(ArrayList<PairDeviceInfo> list);
     }
-
 
     public static void setOnDeviceFoundListener(onDeviceFoundListener mOnDeviceFoundListener) {
         PairListener.m_onDeviceFoundListener = mOnDeviceFoundListener;
@@ -44,7 +44,7 @@ final public class PairListener {
         if(!m_onDataReceivedListener.contains(mOnDataReceivedListener)) m_onDataReceivedListener.add(mOnDataReceivedListener);
     }
 
-    public static void callOnDataReceived(Map<String, String> map) {
+    public static void callOnDataReceived(Data map) {
         if(m_onDataReceivedListener != null) {
             for (onDataReceivedListener listener : m_onDataReceivedListener) {
                 listener.onReceive(map);

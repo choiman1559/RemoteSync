@@ -3,6 +3,8 @@ package com.sync.protocol.service;
 import android.content.Context;
 
 import com.sync.lib.action.PairAction;
+import com.sync.lib.data.Data;
+import com.sync.lib.data.PairDeviceInfo;
 
 import java.util.Map;
 
@@ -13,23 +15,23 @@ public class PairActionListener extends PairAction {
     }
 
     @Override
-    public void onActionRequested(Map<String, String> map, Context context) {
+    public void onActionRequested(Data map, Context context) {
         DataProcess.onActionRequested(map, context);
     }
 
     @Override
-    public void onDataRequested(Map<String, String> map, Context context) {
+    public void onDataRequested(Data map, Context context) {
         DataProcess.onDataRequested(map, context);
     }
 
     @Override
-    public void showPairChoiceAction(Map<String, String> map, Context context) {
+    public void showPairChoiceAction(Data map, Context context) {
         DataProcess.showPairChoiceAction(map, context);
     }
 
     @Override
-    public void onPairRemoved(Map<String, String> map) {
-        super.onPairRemoved(map);
+    public void onPairRemoved(PairDeviceInfo device) {
+        super.onPairRemoved(device);
         //Useless for now: Ignore this event
     }
 }
