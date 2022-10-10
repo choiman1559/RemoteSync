@@ -60,6 +60,11 @@
             android:key="UseAuthWithHMac"
             android:summary="Keep your data safer with HMAC SHA-256"
             android:title="Use message authentication" />
+        <com.sync.protocol.utils.SwitchedPreference
+            android:defaultValue="false"
+            android:key="UseAsymmetricEncryption"
+            android:summary="Using asymmetric method for encryption"
+            android:title="Use asymmetric encryption" />
         <Preference
             android:icon="@drawable/ic_info_outline_black_24dp"
             android:key="EncryptionInfo"

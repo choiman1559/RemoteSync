@@ -13,10 +13,11 @@ import com.sync.lib.action.PairAction;
 import com.sync.lib.action.PairListener;
 import com.sync.lib.data.ConnectionOption;
 import com.sync.lib.data.Data;
+import com.sync.lib.data.KeySpec;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.Value;
 import com.sync.lib.process.ProcessUtil;
-import com.sync.lib.util.AESCrypto;
+import com.sync.lib.util.Crypto;
 import com.sync.lib.util.CompressStringUtil;
 
 import org.json.JSONObject;
@@ -113,7 +114,8 @@ public class Protocol {
     public static void onMessageReceived(@NonNull Map<String, String> rawMap) {
         Data map = new Data(rawMap);
         if ("true".equals(map.get(Value.ENCRYPTED))) {
-            if (connectionOption.isEncryptionEnabled() && !connectionOption.getEncryptionPassword().equals("")) {
+            KeySpec keySpec = connectionOption.getKeySpec();
+            if (connectionOption.isEncryptionEnabled() && keySpec.isValidKey()) {
                 try {
                     JSONObject object;
                     boolean isFirstFetch = "true".equals(map.get(Value.IS_FIRST_FETCHED));
@@ -121,12 +123,10 @@ public class Protocol {
                         return;
                     }
 
-                    if(connectionOption.isAuthWithHMac()) {
-                        String hashKey = isFirstFetch ? Protocol.connectionOption.getPairingKey() : Protocol.connectionOption.getIdentifierValue();
-                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), connectionOption.getEncryptionPassword(), hashKey));
-                    } else {
-                        object = new JSONObject(AESCrypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), connectionOption.getEncryptionPassword()));
-                    }
+                    KeySpec.Builder builder = new KeySpec.Builder(keySpec);
+                    if(keySpec.isAuthWithHMac()) builder.setHmacPassword(isFirstFetch ? Protocol.connectionOption.getPairingKey() : keySpec.getHmacPassword());
+                    keySpec = builder.build();
+                    object = new JSONObject(Crypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), keySpec));
 
                     Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);
                     ProcessUtil.processReception(new Data(newMap), applicationContext);

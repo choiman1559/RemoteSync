@@ -25,8 +25,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.kieronquinn.monetcompat.core.MonetCompat;
 import com.sync.lib.Protocol;
 import com.sync.lib.data.ConnectionOption;
+import com.sync.lib.data.KeySpec;
 import com.sync.protocol.R;
-import com.sync.lib.util.DataUtils;
 
 public class PairPreference extends PreferenceFragmentCompat  {
 
@@ -83,15 +83,22 @@ public class PairPreference extends PreferenceFragmentCompat  {
             ConnectionOption option = new ConnectionOption();
             option.setPairingKey(prefs.getString("UID", ""));
             option.setIdentifierValue(com.sync.protocol.utils.DataUtils.getUniqueID(mContext));
-            option.setEncryptionEnabled(prefs.getBoolean("UseDataEncryption", false));
-            option.setEncryptionPassword(prefs.getString("EncryptionPassword", ""));
             option.setPrintDebugLog(prefs.getBoolean("printDebugLog", false));
             option.setDenyFindRequest(prefs.getBoolean("NotReceiveFindDevice", false));
             option.setShowAlreadyConnected(prefs.getBoolean("showAlreadyConnected", false));
-            option.setAuthWithHMac(prefs.getBoolean("UseAuthWithHMac", false));
+
             option.setAllowRemovePairRemotely(prefs.getBoolean("allowRemovePairRemotely", true));
             option.setAllowAcceptPairAutomatically(prefs.getBoolean("allowAcceptPairAutomatically", false));
             option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
+
+            option.setEncryptionEnabled(prefs.getBoolean("UseDataEncryption", false));
+            KeySpec keySpec = new KeySpec.Builder()
+                    .setAuthWithHMac(prefs.getBoolean("UseAuthWithHMac", false))
+                    .setEncryptionPassword(prefs.getString("EncryptionPassword", ""))
+                    .setHmacPassword(option.getIdentifierValue())
+                    .setIsSymmetric(prefs.getBoolean("UseAsymmetricEncryption", false))
+                    .build();
+            option.setKeySpec(keySpec);
 
             Protocol.setConnectionOption(option);
         });

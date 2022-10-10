@@ -1,5 +1,7 @@
 package com.sync.lib.util;
 
+import static com.sync.lib.Protocol.connectionOption;
+
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -7,6 +9,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sync.lib.Protocol;
+import com.sync.lib.data.KeySpec;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.Value;
 
@@ -45,14 +48,12 @@ public class DataUtils {
         final String TAG = "NOTIFICATION TAG";
 
         try {
-            String rawPassword = Protocol.getConnectionOption().getEncryptionPassword();
-            if (Protocol.connectionOption.isEncryptionEnabled() && !rawPassword.equals("")) {
-                String encryptedData;
-                if (Protocol.connectionOption.isAuthWithHMac()) {
-                    encryptedData = AESCrypto.encrypt(notificationBody.toString(), rawPassword, isFirstFetch ? Protocol.connectionOption.getPairingKey() : notificationBody.getString(Value.SEND_DEVICE_ID.id()));
-                } else {
-                    encryptedData = AESCrypto.encrypt(notificationBody.toString(), rawPassword);
-                }
+            KeySpec keySpec = connectionOption.getKeySpec();
+            if (connectionOption.isEncryptionEnabled() && keySpec.isValidKey()) {
+                KeySpec.Builder builder = new KeySpec.Builder(keySpec);
+                if(keySpec.isAuthWithHMac()) builder.setHmacPassword(isFirstFetch ? connectionOption.getPairingKey() : notificationBody.getString(Value.SEND_DEVICE_ID.id()));
+                keySpec = builder.build();
+                String encryptedData = Crypto.encrypt(notificationBody.toString(), keySpec);
 
                 JSONObject newData = new JSONObject();
                 newData.put(Value.ENCRYPTED.id(), "true");
@@ -63,12 +64,12 @@ public class DataUtils {
                 notificationBody = notificationBody.put(Value.ENCRYPTED.id(), "false");
             }
         } catch (Exception e) {
-            if (Protocol.connectionOption.isPrintDebugLog()) e.printStackTrace();
+            if (connectionOption.isPrintDebugLog()) e.printStackTrace();
         }
 
         JSONObject notification = new JSONObject();
         try {
-            String Topic = "/topics/" + Protocol.connectionOption.getPairingKey();
+            String Topic = "/topics/" + connectionOption.getPairingKey();
             notification.put(Value.TOPIC.id(), Topic);
             notification.put(Value.PRIORITY.id(), "high");
             notification.put(Value.DATA.id(), notificationBody);

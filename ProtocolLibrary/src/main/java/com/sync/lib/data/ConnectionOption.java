@@ -4,26 +4,24 @@ public class ConnectionOption {
     private String pairingKey;
     private String identifierValue;
     private boolean encryptionEnabled;
-    private String encryptionPassword;
     private boolean printDebugLog;
     private boolean showAlreadyConnected;
     private boolean isReceiveFindRequest;
     private boolean allowRemovePairRemotely;
     private boolean allowAcceptPairAutomatically;
-    private boolean authWithHMac;
     private String serverKey;
+    private KeySpec keySpec;
 
     public ConnectionOption() {
         encryptionEnabled = false;
         printDebugLog = false;
         showAlreadyConnected = false;
         isReceiveFindRequest = false;
-        authWithHMac = false;
         allowAcceptPairAutomatically = false;
         pairingKey = "";
         identifierValue = "";
-        encryptionPassword = "";
         serverKey = "";
+        keySpec = new KeySpec();
     }
 
     public void setServerKey(String serverKey) {
@@ -46,10 +44,6 @@ public class ConnectionOption {
         this.encryptionEnabled = encryptionEnabled;
     }
 
-    public void setEncryptionPassword(String encryptionPassword) {
-        this.encryptionPassword = encryptionPassword;
-    }
-
     public void setPrintDebugLog(boolean printDebugLog) {
         this.printDebugLog = printDebugLog;
     }
@@ -66,6 +60,10 @@ public class ConnectionOption {
         this.allowAcceptPairAutomatically = allowAcceptPairAutomatically;
     }
 
+    public void setKeySpec(KeySpec keySpec) {
+        this.keySpec = keySpec;
+    }
+
     public boolean isEncryptionEnabled() {
         return encryptionEnabled;
     }
@@ -78,16 +76,8 @@ public class ConnectionOption {
         return showAlreadyConnected;
     }
 
-    public boolean isAuthWithHMac() {
-        return authWithHMac;
-    }
-
-    public void setAuthWithHMac(boolean authWithHMac) {
-        this.authWithHMac = authWithHMac;
-    }
-
-    public String getEncryptionPassword() {
-        return encryptionPassword;
+    public KeySpec getKeySpec() {
+        return keySpec;
     }
 
     public String getIdentifierValue() {

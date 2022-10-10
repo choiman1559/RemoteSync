@@ -3,6 +3,7 @@ package com.sync.protocol.service;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.media.session.MediaSessionManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -27,6 +29,10 @@ import com.sync.protocol.R;
 import com.sync.protocol.utils.PowerUtils;
 
 public class FirebaseMessageService extends FirebaseMessagingService {
+
+    private final MediaSessionManager mMediaSessionManager = (MediaSessionManager)getSystemService(Context.MEDIA_SESSION_SERVICE);
+    private final MediaSessionManager.OnActiveSessionsChangedListener mSessionsChangedListener = (list -> {});
+
     SharedPreferences prefs;
     private static PowerUtils manager;
     public static volatile Ringtone lastPlayedRingtone;
@@ -45,6 +51,9 @@ public class FirebaseMessageService extends FirebaseMessagingService {
         manager = PowerUtils.getInstance(this);
         manager.acquire();
         instance = this;
+
+        ComponentName listenerComponent = new ComponentName(this, NotificationListener.class);
+        mMediaSessionManager.addOnActiveSessionsChangedListener(mSessionsChangedListener, listenerComponent);
     }
 
     public static FirebaseMessageService getInstance() {
