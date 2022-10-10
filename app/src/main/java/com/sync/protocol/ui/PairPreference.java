@@ -95,7 +95,6 @@ public class PairPreference extends PreferenceFragmentCompat  {
             KeySpec keySpec = new KeySpec.Builder()
                     .setAuthWithHMac(prefs.getBoolean("UseAuthWithHMac", false))
                     .setEncryptionPassword(prefs.getString("EncryptionPassword", ""))
-                    .setHmacPassword(option.getIdentifierValue())
                     .setIsSymmetric(prefs.getBoolean("UseAsymmetricEncryption", false))
                     .build();
             option.setKeySpec(keySpec);

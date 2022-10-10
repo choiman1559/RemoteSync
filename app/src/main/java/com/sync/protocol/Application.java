@@ -33,7 +33,6 @@ public class Application extends android.app.Application {
         KeySpec keySpec = new KeySpec.Builder()
                 .setEncryptionPassword(prefs.getString("EncryptionPassword", ""))
                 .setAuthWithHMac(prefs.getBoolean("UseAuthWithHMac", false))
-                .setHmacPassword(option.getIdentifierValue())
                 .setIsSymmetric(prefs.getBoolean("UseAsymmetricEncryption", false))
                 .build();
         option.setKeySpec(keySpec);

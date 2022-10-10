@@ -123,9 +123,7 @@ public class Protocol {
                         return;
                     }
 
-                    KeySpec.Builder builder = new KeySpec.Builder(keySpec);
-                    if(keySpec.isAuthWithHMac()) builder.setHmacPassword(isFirstFetch ? Protocol.connectionOption.getPairingKey() : keySpec.getHmacPassword());
-                    keySpec = builder.build();
+                    if(keySpec.isAuthWithHMac()) keySpec.setSecondaryPassword(isFirstFetch ? Protocol.connectionOption.getPairingKey() : keySpec.getSecondaryPassword());
                     object = new JSONObject(Crypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), keySpec));
 
                     Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);

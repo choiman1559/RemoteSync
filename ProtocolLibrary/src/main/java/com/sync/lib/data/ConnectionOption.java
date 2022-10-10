@@ -61,6 +61,7 @@ public class ConnectionOption {
     }
 
     public void setKeySpec(KeySpec keySpec) {
+        keySpec.setSecondaryPassword(identifierValue);
         this.keySpec = keySpec;
     }
 

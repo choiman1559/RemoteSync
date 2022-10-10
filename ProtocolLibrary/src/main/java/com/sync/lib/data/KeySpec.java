@@ -1,16 +1,17 @@
 package com.sync.lib.data;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class KeySpec {
     private String encryptionPassword;
-    private String hmacPassword;
+    private String secondaryPassword;
     private boolean authWithHMac;
     private boolean isSymmetric;
 
     KeySpec() {
         encryptionPassword = "";
-        hmacPassword = "";
+        secondaryPassword = "";
         authWithHMac = false;
         isSymmetric = false;
     }
@@ -28,11 +29,6 @@ public class KeySpec {
 
         public Builder setEncryptionPassword(String encryptionPassword) {
             keySpec.encryptionPassword = encryptionPassword;
-            return this;
-        }
-
-        public Builder setHmacPassword(String hmacPassword) {
-            keySpec.hmacPassword = hmacPassword;
             return this;
         }
 
@@ -55,8 +51,8 @@ public class KeySpec {
         return encryptionPassword;
     }
 
-    public String getHmacPassword() {
-        return hmacPassword;
+    public String getSecondaryPassword() {
+        return secondaryPassword;
     }
 
     public boolean isAuthWithHMac() {
@@ -67,22 +63,41 @@ public class KeySpec {
         return isSymmetric;
     }
 
-    public byte[] getEncryptionPasswordBytes() {
-        return parseToken(encryptionPassword).getBytes(StandardCharsets.UTF_8);
+    public byte[] getAesPasswordInBytes() {
+        return parseToken(encryptionPassword, secondaryPassword);
     }
 
-    public byte[] getHmacPasswordBytes() {
-        return parseToken(hmacPassword).getBytes(StandardCharsets.UTF_8);
+    public byte[] getHashPasswordInBytes() {
+        return parseToken(secondaryPassword, encryptionPassword);
+    }
+
+    public void setSecondaryPassword(String secondaryPassword) {
+        this.secondaryPassword = secondaryPassword;
     }
 
     public boolean isValidKey() {
         boolean isPasswordValid = encryptionPassword != null && !encryptionPassword.isEmpty();
-        return authWithHMac ? isPasswordValid && hmacPassword != null && !hmacPassword.isEmpty() : isPasswordValid;
+        return authWithHMac ? isPasswordValid && secondaryPassword != null && !secondaryPassword.isEmpty() : isPasswordValid;
     }
 
-    private String parseToken(String string) {
-        if (string.length() == 32) return string;
-        string += "D~L*e/`/Q*a&h~e0jy$zU!sg?}X`CU*I";
-        return string.substring(0, 32);
+    private byte[] parseToken(String main, String sub) {
+        if (isSymmetric) {
+            byte[] mainBytes = main.getBytes(StandardCharsets.UTF_8);
+            byte[] subBytes = sub.getBytes(StandardCharsets.UTF_8);
+
+            return getCombinedArray(Arrays.copyOfRange(mainBytes, 0, 24), Arrays.copyOfRange(subBytes, subBytes.length - 8, subBytes.length));
+        } else {
+            if (main.length() == 32) return main.getBytes(StandardCharsets.UTF_8);
+            main += "D~L*e/`/Q*a&h~e0jy$zU!sg?}X`CU*I";
+            return main.substring(0, 32).getBytes(StandardCharsets.UTF_8);
+        }
+    }
+
+    private static byte[] getCombinedArray(byte[] one, byte[] two) {
+        byte[] combined = new byte[one.length + two.length];
+        for (int i = 0; i < combined.length; ++i) {
+            combined[i] = i < one.length ? one[i] : two[i - one.length];
+        }
+        return combined;
     }
 }

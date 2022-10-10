@@ -50,9 +50,7 @@ public class DataUtils {
         try {
             KeySpec keySpec = connectionOption.getKeySpec();
             if (connectionOption.isEncryptionEnabled() && keySpec.isValidKey()) {
-                KeySpec.Builder builder = new KeySpec.Builder(keySpec);
-                if(keySpec.isAuthWithHMac()) builder.setHmacPassword(isFirstFetch ? connectionOption.getPairingKey() : notificationBody.getString(Value.SEND_DEVICE_ID.id()));
-                keySpec = builder.build();
+                if(keySpec.isAuthWithHMac()) keySpec.setSecondaryPassword(isFirstFetch ? connectionOption.getPairingKey() : notificationBody.getString(Value.SEND_DEVICE_ID.id()));
                 String encryptedData = Crypto.encrypt(notificationBody.toString(), keySpec);
 
                 JSONObject newData = new JSONObject();

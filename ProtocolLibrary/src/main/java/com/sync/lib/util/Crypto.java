@@ -29,13 +29,13 @@ public class Crypto {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(keySpec.getEncryptionPasswordBytes(), "AES"), new IvParameterSpec(iv));
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(keySpec.getAesPasswordInBytes(), "AES"), new IvParameterSpec(iv));
         byte[] cipherText = cipher.doFinal(plain.getBytes(StandardCharsets.UTF_8));
 
         byte[] data = iv;
         if(keySpec.isAuthWithHMac()) {
             final String HMacAlgorithm = "HmacSHA256";
-            SecretKeySpec secretKey = new SecretKeySpec(keySpec.getHmacPasswordBytes(), HMacAlgorithm);
+            SecretKeySpec secretKey = new SecretKeySpec(keySpec.getHashPasswordInBytes(), HMacAlgorithm);
             Mac hasher = Mac.getInstance(HMacAlgorithm);
 
             hasher.init(secretKey);
@@ -67,7 +67,7 @@ public class Crypto {
             cipherText = Arrays.copyOfRange(rawByteArray, 48, rawByteArray.length);
 
             final String HMacAlgorithm = "HmacSHA256";
-            SecretKeySpec secretKey = new SecretKeySpec(keySpec.getHmacPasswordBytes(), HMacAlgorithm);
+            SecretKeySpec secretKey = new SecretKeySpec(keySpec.getHashPasswordInBytes(), HMacAlgorithm);
             Mac hasher = Mac.getInstance(HMacAlgorithm);
 
             hasher.init(secretKey);
@@ -83,7 +83,7 @@ public class Crypto {
         }
 
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keySpec.getEncryptionPasswordBytes(), "AES"), new IvParameterSpec(iv));
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keySpec.getAesPasswordInBytes(), "AES"), new IvParameterSpec(iv));
         return new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8);
     }
 
