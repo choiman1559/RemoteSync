@@ -99,7 +99,7 @@ public class PairPreference extends PreferenceFragmentCompat  {
                     .build();
             option.setKeySpec(keySpec);
 
-            Protocol.setConnectionOption(option);
+            Protocol.getInstance().setConnectionOption(option);
         });
     }
 

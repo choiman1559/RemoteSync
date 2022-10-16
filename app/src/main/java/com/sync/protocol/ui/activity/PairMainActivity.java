@@ -62,7 +62,7 @@ public class PairMainActivity extends MonetCompatActivity {
     }
 
     void loadDeviceList() {
-        ArrayList<PairDeviceInfo> list = Protocol.getPairedDeviceList();
+        ArrayList<PairDeviceInfo> list = Protocol.getInstance().getPairedDeviceList();
         if(list.size() == deviceListLayout.getChildCount()) return;
         deviceListLayout.removeViews(0, deviceListLayout.getChildCount());
 

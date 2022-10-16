@@ -4,7 +4,6 @@ import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 final public class PairListener {
     public static onDeviceFoundListener m_onDeviceFoundListener;

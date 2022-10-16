@@ -11,7 +11,6 @@ import com.sync.lib.data.PairDeviceStatus;
 import com.sync.lib.data.Value;
 
 import java.util.HashSet;
-import java.util.Map;
 
 public class ProcessUtil {
     /**
@@ -21,19 +20,20 @@ public class ProcessUtil {
      * @param map Custom class that extends PairAction Listener to get action requested from protocol
      */
     public static void processReception(Data map, Context context) {
+        Protocol instance = Protocol.getInstance();
         String type = map.get(Value.TYPE);
 
-        if(Protocol.connectionOption.isPrintDebugLog()) Log.d("SyncProtocol", type + " Sent device: " + map.getDevice().toString());
-        if (type != null && !Protocol.connectionOption.getPairingKey().equals("")) {
+        if(instance.connectionOption.isPrintDebugLog()) Log.d("SyncProtocol", type + " Sent device: " + map.getDevice().toString());
+        if (type != null && !instance.connectionOption.getPairingKey().equals("")) {
             if (type.startsWith("pair") && !isDeviceItself(map)) {
                 PairDeviceInfo device = new PairDeviceInfo(map.get(Value.DEVICE_NAME), map.get(Value.DEVICE_ID), PairDeviceStatus.Device_Process_Pairing);
                 switch (type) {
                     case "pair|request_device_list":
                         //Target Device action
                         //Have to Send this device info Data Now
-                        if (!isPairedDevice(map) || Protocol.connectionOption.isShowAlreadyConnected()) {
-                            Protocol.pairingProcessList.add(device);
-                            Protocol.isListeningToPair = true;
+                        if (!isPairedDevice(map) || instance.connectionOption.isShowAlreadyConnected()) {
+                            instance.pairingProcessList.add(device);
+                            instance.isListeningToPair = true;
                             Process.responseDeviceInfoToFinder(map, context);
                         }
                         break;
@@ -41,8 +41,8 @@ public class ProcessUtil {
                     case "pair|response_device_list":
                         //Request Device Action
                         //Show device list here; give choice to user which device to pair
-                        if (Protocol.isFindingDeviceToPair && (!isPairedDevice(map) || Protocol.connectionOption.isShowAlreadyConnected())) {
-                            Protocol.pairingProcessList.add(device);
+                        if (Protocol.getInstance().isFindingDeviceToPair && (!isPairedDevice(map) || Protocol.getInstance().connectionOption.isShowAlreadyConnected())) {
+                            Protocol.getInstance().pairingProcessList.add(device);
                             Process.onReceiveDeviceInfo(map);
                         }
                         break;
@@ -50,13 +50,13 @@ public class ProcessUtil {
                     case "pair|request_pair":
                         //Target Device action
                         //Show choice notification (or activity) to user whether user wants to pair this device with another one or not
-                        if (Protocol.isListeningToPair && isTargetDevice(map)) {
-                            for (PairDeviceInfo info : Protocol.pairingProcessList) {
+                        if (instance.isListeningToPair && isTargetDevice(map)) {
+                            for (PairDeviceInfo info : instance.pairingProcessList) {
                                 if (info.equals(device)) {
-                                    if(Protocol.connectionOption.isAllowAcceptPairAutomatically()) {
+                                    if(instance.connectionOption.isAllowAcceptPairAutomatically()) {
                                         Process.responsePairAcceptation(device, true, context);
                                     } else {
-                                        Protocol.action.showPairChoiceAction(map, context);
+                                        instance.action.showPairChoiceAction(map, context);
                                     }
                                     break;
                                 }
@@ -67,8 +67,8 @@ public class ProcessUtil {
                     case "pair|accept_pair":
                         //Request Device Action
                         //Check if target accepted to pair and process result here
-                        if (Protocol.isFindingDeviceToPair && isTargetDevice(map)) {
-                            for (PairDeviceInfo info : Protocol.pairingProcessList) {
+                        if (instance.isFindingDeviceToPair && isTargetDevice(map)) {
+                            for (PairDeviceInfo info : instance.pairingProcessList) {
                                 if (info.equals(map.getDevice())) {
                                     Process.checkPairResultAndRegister(map, info);
                                     break;
@@ -78,7 +78,7 @@ public class ProcessUtil {
                         break;
 
                     case "pair|request_remove":
-                        if(isTargetDevice(map) && isPairedDevice(map) && Protocol.connectionOption.isAllowRemovePairRemotely()) {
+                        if(isTargetDevice(map) && isPairedDevice(map) && instance.connectionOption.isAllowRemovePairRemotely()) {
                             Process.removePairedDevice(device, true);
                         }
                         break;
@@ -86,7 +86,7 @@ public class ProcessUtil {
                     case "pair|request_data":
                         //process request normal data here sent by paired device(s).
                         if (isTargetDevice(map) && isPairedDevice(map)) {
-                            Protocol.action.onDataRequested(map, context);
+                            instance.action.onDataRequested(map, context);
                         }
                         break;
 
@@ -100,13 +100,13 @@ public class ProcessUtil {
                     case "pair|request_action":
                         //process received action data here sent by paired device(s).
                         if (isTargetDevice(map) && isPairedDevice(map)) {
-                            Protocol.action.onActionRequested(map, context);
+                            instance.action.onActionRequested(map, context);
                         }
                         break;
 
                     case "pair|find":
-                        if (isTargetDevice(map) && isPairedDevice(map) && !Protocol.connectionOption.isReceiveFindRequest()) {
-                            Protocol.action.onFindRequest();
+                        if (isTargetDevice(map) && isPairedDevice(map) && !instance.connectionOption.isReceiveFindRequest()) {
+                            instance.action.onFindRequest();
                         }
                         break;
                 }
@@ -128,7 +128,7 @@ public class ProcessUtil {
             Device_name = map.get(Value.SEND_DEVICE_NAME);
         }
 
-        return Protocol.thisDevice.equals(new PairDeviceInfo(Device_name, Device_id));
+        return Protocol.getInstance().thisDevice.equals(new PairDeviceInfo(Device_name, Device_id));
     }
 
     /**
@@ -140,7 +140,7 @@ public class ProcessUtil {
         String Device_name = map.get(Value.SEND_DEVICE_NAME);
         String Device_id = map.get(Value.SEND_DEVICE_ID);
 
-        return Protocol.thisDevice.equals(new PairDeviceInfo(Device_name, Device_id));
+        return Protocol.getInstance().thisDevice.equals(new PairDeviceInfo(Device_name, Device_id));
     }
 
     /**
@@ -150,7 +150,7 @@ public class ProcessUtil {
      */
     protected static boolean isPairedDevice(Data map) {
         String dataToFind = map.getDevice().toString();
-        for (String str : Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>())) {
+        for (String str : Protocol.getInstance().pairPrefs.getStringSet("paired_list", new HashSet<>())) {
             if (str.equals(dataToFind)) return true;
         }
         return false;

@@ -5,9 +5,7 @@ import android.content.Context;
 import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 
-import java.util.Map;
-
-public class PairAction {
+public abstract class PairAction {
     public void onFindRequest() {}
     public void onActionRequested(Data map, Context context) {}
     public void onDataRequested(Data map, Context context) {}

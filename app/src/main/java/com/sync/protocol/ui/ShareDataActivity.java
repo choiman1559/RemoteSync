@@ -64,7 +64,7 @@ public class ShareDataActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         AtomicInteger deviceSelection = new AtomicInteger();
         ArrayList<String> nameList = new ArrayList<>();
-        ArrayList<PairDeviceInfo> rawList = Protocol.getPairedDeviceList();
+        ArrayList<PairDeviceInfo> rawList = Protocol.getInstance().getPairedDeviceList();
         for (PairDeviceInfo device : rawList) {
             nameList.add(device.getDevice_name());
         }

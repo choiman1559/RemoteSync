@@ -26,13 +26,14 @@ public class Process {
      * @param context android context instance
      */
     public static void requestDeviceListWidely(Context context) {
-        Protocol.isFindingDeviceToPair = true;
+        Protocol instance = Protocol.getInstance();
+        instance.isFindingDeviceToPair = true;
         JSONObject notificationBody = new JSONObject();
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|request_device_list");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
         } catch (JSONException e) {
             Log.e("Noti", "onCreate: " + e.getMessage());
         }
@@ -47,13 +48,14 @@ public class Process {
      * @param context android context instance
      */
     public static void responseDeviceInfoToFinder(Data map, Context context) {
+        Protocol instance = Protocol.getInstance();
         JSONObject notificationBody = new JSONObject();
         PairDeviceInfo device = map.getDevice();
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|response_device_list");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
@@ -79,11 +81,12 @@ public class Process {
      * @param context android context instance
      */
     public static void requestPair(PairDeviceInfo device, Context context) {
+        Protocol instance = Protocol.getInstance();
         JSONObject notificationBody = new JSONObject();
         try {
             notificationBody.put(Value.TYPE.id(), "pair|request_pair");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
@@ -101,12 +104,13 @@ public class Process {
      * @param context android context instance
      */
     public static void responsePairAcceptation(PairDeviceInfo device, boolean isAccepted, Context context) {
+        Protocol instance = Protocol.getInstance();
         if (isAccepted) {
             registerDevice(device);
-            for (PairDeviceInfo info : Protocol.pairingProcessList) {
+            for (PairDeviceInfo info : instance.pairingProcessList) {
                 if (info.getDevice_name().equals(device.getDevice_name()) && info.getDevice_id().equals(device.getDevice_id())) {
-                    Protocol.isListeningToPair = false;
-                    Protocol.pairingProcessList.remove(info);
+                    instance.isListeningToPair = false;
+                    instance.pairingProcessList.remove(info);
                     break;
                 }
             }
@@ -115,8 +119,8 @@ public class Process {
         JSONObject notificationBody = new JSONObject();
         try {
             notificationBody.put(Value.TYPE.id(), "pair|accept_pair");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.PAIR_ACCEPT.id(), isAccepted ? "true" : "false");
@@ -133,10 +137,11 @@ public class Process {
      * @param device target device to save in preferences
      */
     protected static void registerDevice(PairDeviceInfo device) {
+        Protocol instance = Protocol.getInstance();
         boolean isNotRegistered = true;
         String dataToSave = device.toString();
 
-        Set<String> list = new HashSet<>(Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>()));
+        Set<String> list = new HashSet<>(instance.pairPrefs.getStringSet("paired_list", new HashSet<>()));
         for(String str : list) {
             if(str.equals(dataToSave)) {
                 isNotRegistered = false;
@@ -146,7 +151,7 @@ public class Process {
 
         if(isNotRegistered) {
             list.add(dataToSave);
-            Protocol.pairPrefs.edit().putStringSet("paired_list", list).apply();
+            instance.pairPrefs.edit().putStringSet("paired_list", list).apply();
         }
     }
 
@@ -160,8 +165,9 @@ public class Process {
         if (m_onDevicePairResultListener != null) m_onDevicePairResultListener.onReceive(map);
         if ("true".equals(map.get(Value.PAIR_ACCEPT))) {
             registerDevice(info);
-            Protocol.isFindingDeviceToPair = false;
-            Protocol.pairingProcessList.remove(info);
+            Protocol instance = Protocol.getInstance();
+            instance.isFindingDeviceToPair = false;
+            instance.pairingProcessList.remove(info);
         }
     }
 
@@ -172,10 +178,11 @@ public class Process {
      * @param haveToAnnounce Set whether call "onPairRemoved" listener after delete device
      */
     public static void removePairedDevice(PairDeviceInfo device, boolean haveToAnnounce) {
-        Set<String> list = new HashSet<>(Protocol.pairPrefs.getStringSet("paired_list", new HashSet<>()));
+        Protocol instance = Protocol.getInstance();
+        Set<String> list = new HashSet<>(Protocol.getInstance().pairPrefs.getStringSet("paired_list", new HashSet<>()));
         list.remove(device.toString());
-        Protocol.pairPrefs.edit().putStringSet("paired_list", list).apply();
-        if(haveToAnnounce) Protocol.action.onPairRemoved(device);
+        instance.pairPrefs.edit().putStringSet("paired_list", list).apply();
+        if(haveToAnnounce) instance.action.onPairRemoved(device);
     }
 
     /**
@@ -185,13 +192,14 @@ public class Process {
      * @param context android context instance
      */
     public static void requestRemovePair(Context context, PairDeviceInfo device) {
+        Protocol instance = Protocol.getInstance();
         removePairedDevice(device, false);
         JSONObject notificationBody = new JSONObject();
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|request_remove");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
@@ -202,6 +210,6 @@ public class Process {
     }
 
     private static boolean isShowDebugLog() {
-        return Protocol.connectionOption.isPrintDebugLog();
+        return Protocol.getInstance().connectionOption.isPrintDebugLog();
     }
 }

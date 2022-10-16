@@ -1,7 +1,5 @@
 package com.sync.lib.util;
 
-import static com.sync.lib.Protocol.connectionOption;
-
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,15 +40,17 @@ public class DataUtils {
      * @param isFirstFetch Whether or not you are pitching with the target device for the first time
      */
     public static void sendNotification(JSONObject notificationBody, String PackageName, Context context, boolean isFirstFetch) {
+        Protocol instance = Protocol.getInstance();
+
         final String FCM_API = "https://fcm.googleapis.com/fcm/send";
-        final String serverKey = Protocol.getConnectionOption().getServerKey();
+        final String serverKey = instance.connectionOption.getServerKey();
         final String contentType = "application/json";
         final String TAG = "NOTIFICATION TAG";
 
         try {
-            KeySpec keySpec = connectionOption.getKeySpec();
-            if (connectionOption.isEncryptionEnabled() && keySpec.isValidKey()) {
-                if(keySpec.isAuthWithHMac()) keySpec.setSecondaryPassword(isFirstFetch ? connectionOption.getPairingKey() : notificationBody.getString(Value.SEND_DEVICE_ID.id()));
+            KeySpec keySpec = instance.connectionOption.getKeySpec();
+            if (instance.connectionOption.isEncryptionEnabled() && keySpec.isValidKey()) {
+                if(keySpec.isAuthWithHMac()) keySpec.setSecondaryPassword(isFirstFetch ? instance.connectionOption.getPairingKey() : notificationBody.getString(Value.SEND_DEVICE_ID.id()));
                 String encryptedData = Crypto.encrypt(notificationBody.toString(), keySpec);
 
                 JSONObject newData = new JSONObject();
@@ -62,12 +62,12 @@ public class DataUtils {
                 notificationBody = notificationBody.put(Value.ENCRYPTED.id(), "false");
             }
         } catch (Exception e) {
-            if (connectionOption.isPrintDebugLog()) e.printStackTrace();
+            if (instance.connectionOption.isPrintDebugLog()) e.printStackTrace();
         }
 
         JSONObject notification = new JSONObject();
         try {
-            String Topic = "/topics/" + connectionOption.getPairingKey();
+            String Topic = "/topics/" + instance.connectionOption.getPairingKey();
             notification.put(Value.TOPIC.id(), Topic);
             notification.put(Value.PRIORITY.id(), "high");
             notification.put(Value.DATA.id(), notificationBody);
@@ -99,13 +99,14 @@ public class DataUtils {
      * @param context current Android context instance
      */
     public static void sendFindTaskNotification(Context context, PairDeviceInfo device) {
+        Protocol instance = Protocol.getInstance();
         Date date = Calendar.getInstance().getTime();
         JSONObject notificationBody = new JSONObject();
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|find");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.SENT_DATE.id(), date);
@@ -124,13 +125,14 @@ public class DataUtils {
      * @param dataType type of data to request
      */
     public static void requestData(Context context, PairDeviceInfo device, String dataType) {
+        Protocol instance = Protocol.getInstance();
         Date date = Calendar.getInstance().getTime();
         JSONObject notificationBody = new JSONObject();
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|request_data");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.REQUEST_DATA.id(), dataType);
@@ -150,13 +152,14 @@ public class DataUtils {
      * @param dataContent the value of the requested data
      */
     public static void responseDataRequest(PairDeviceInfo device, String dataType, String dataContent, Context context) {
+        Protocol instance = Protocol.getInstance();
         Date date = Calendar.getInstance().getTime();
         JSONObject notificationBody = new JSONObject();
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|receive_data");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.RECEIVE_DATA.id(), dataContent);
@@ -177,6 +180,7 @@ public class DataUtils {
      * @param args     Argument data required to execute the action
      */
     public static void requestAction(Context context, PairDeviceInfo device, String dataType, String... args) {
+        Protocol instance = Protocol.getInstance();
         StringBuilder dataToSend = new StringBuilder();
         if (args.length > 1) {
             for (String str : args) {
@@ -190,8 +194,8 @@ public class DataUtils {
 
         try {
             notificationBody.put(Value.TYPE.id(), "pair|request_action");
-            notificationBody.put(Value.DEVICE_NAME.id(), Protocol.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), Protocol.thisDevice.getDevice_id());
+            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.REQUEST_ACTION.id(), dataType);

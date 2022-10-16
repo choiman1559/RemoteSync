@@ -30,21 +30,36 @@ import java.util.Set;
 
 import me.pushy.sdk.lib.jackson.databind.ObjectMapper;
 
+@SuppressWarnings("unused")
 public class Protocol {
-    public static boolean isFindingDeviceToPair;
-    public static boolean isListeningToPair;
-    public static ArrayList<PairDeviceInfo> pairingProcessList;
-    public static ConnectionOption connectionOption;
-    public static SharedPreferences pairPrefs;
-    public static Context applicationContext;
-    public static PairAction action;
-    public static PairDeviceInfo thisDevice;
+    private static Protocol instance;
+
+    public boolean isFindingDeviceToPair;
+    public boolean isListeningToPair;
+    public ArrayList<PairDeviceInfo> pairingProcessList;
+    public ConnectionOption connectionOption;
+    public SharedPreferences pairPrefs;
+    public Context applicationContext;
+    public PairAction action;
+    public PairDeviceInfo thisDevice;
 
     static SharedPreferences.OnSharedPreferenceChangeListener onChange = ((sharedPreferences, key) -> {
-        if(key.equals("paired_list")) {
-            PairListener.m_onDeviceListChangedListener.onReceive(getPairedDeviceList());
+        if(instance != null && key.equals("paired_list")) {
+            PairListener.m_onDeviceListChangedListener.onReceive(instance.getPairedDeviceList());
         }
     });
+
+    /**
+     * get previously initialized Protocol instance
+     * This method must be called after calling initialize() method at least once
+     *
+     * @return an Protocol instance
+     * @throws NullPointerException throws when previously initialized Protocol instance is not available
+     */
+    public synchronized static Protocol getInstance() throws NullPointerException {
+        if(instance == null) throw new NullPointerException("Protocol is not initialized yet!");
+        else return instance;
+    }
 
     /**
      * initialize protocol
@@ -52,17 +67,22 @@ public class Protocol {
      *
      * @param context Android application class context
      * @param object Custom class that extends PairAction Listener to get action requested from protocol
+     * @return an initialized Protocol instance
      */
-    public static void initialize(Context context, PairAction object) {
-        isFindingDeviceToPair = false;
-        isListeningToPair = false;
-        pairingProcessList = new ArrayList<>();
-        pairPrefs = context.getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
-        if(connectionOption == null) connectionOption = new ConnectionOption();
-        applicationContext = context;
-        action = object;
-        thisDevice = new PairDeviceInfo(Build.MANUFACTURER + " " + Build.MODEL, connectionOption.getIdentifierValue());
-        pairPrefs.registerOnSharedPreferenceChangeListener(onChange);
+    public synchronized static Protocol initialize(Context context, PairAction object) {
+        instance = new Protocol();
+
+        instance.isFindingDeviceToPair = false;
+        instance.isListeningToPair = false;
+        instance.pairingProcessList = new ArrayList<>();
+        instance.pairPrefs = context.getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
+        if(instance.connectionOption == null) instance.connectionOption = new ConnectionOption();
+        instance.applicationContext = context;
+        instance.action = object;
+        instance.thisDevice = new PairDeviceInfo(Build.MANUFACTURER + " " + Build.MODEL, instance.connectionOption.getIdentifierValue());
+        instance.pairPrefs.registerOnSharedPreferenceChangeListener(onChange);
+
+        return instance;
     }
 
     /**
@@ -70,33 +90,33 @@ public class Protocol {
      *
      * @param connectionOption user-customized connection option
      */
-    public static void setConnectionOption(ConnectionOption connectionOption) {
-        Protocol.connectionOption = connectionOption;
-        thisDevice = new PairDeviceInfo(Build.MANUFACTURER + " " + Build.MODEL, connectionOption.getIdentifierValue());
+    public void setConnectionOption(ConnectionOption connectionOption) {
+        this.connectionOption = connectionOption;
+        this.thisDevice = new PairDeviceInfo(Build.MANUFACTURER + " " + Build.MODEL, connectionOption.getIdentifierValue());
     }
 
     /**
      * get current connection option
      * @return current ConnectionOption object
      */
-    public static ConnectionOption getConnectionOption() {
-        return connectionOption;
+    public ConnectionOption getConnectionOption() {
+        return this.connectionOption;
     }
 
     /**
      * get list of current pairing devices
      * @return current ArrayList<PairDeviceInfo> object
      */
-    public static ArrayList<PairDeviceInfo> getPairingProcessList() {
-        return pairingProcessList;
+    public ArrayList<PairDeviceInfo> getPairingProcessList() {
+        return this.pairingProcessList;
     }
 
     /**
      * get list of current paired devices
      * @return current ArrayList<PairDeviceInfo> object
      */
-    public static ArrayList<PairDeviceInfo> getPairedDeviceList() {
-        Set<String> array = pairPrefs.getStringSet("paired_list", new HashSet<>());
+    public ArrayList<PairDeviceInfo> getPairedDeviceList() {
+        Set<String> array = this.pairPrefs.getStringSet("paired_list", new HashSet<>());
         ArrayList<PairDeviceInfo> list = new ArrayList<>();
         for(String str : array) {
             String[] data = str.split("\\|");
@@ -111,7 +131,7 @@ public class Protocol {
      * @param rawMap Raw data from FCM
      */
     @SuppressWarnings("unchecked")
-    public static void onMessageReceived(@NonNull Map<String, String> rawMap) {
+    public void onMessageReceived(@NonNull Map<String, String> rawMap) {
         Data map = new Data(rawMap);
         if ("true".equals(map.get(Value.ENCRYPTED))) {
             KeySpec keySpec = connectionOption.getKeySpec();
@@ -123,7 +143,7 @@ public class Protocol {
                         return;
                     }
 
-                    if(keySpec.isAuthWithHMac()) keySpec.setSecondaryPassword(isFirstFetch ? Protocol.connectionOption.getPairingKey() : keySpec.getSecondaryPassword());
+                    if(keySpec.isAuthWithHMac()) keySpec.setSecondaryPassword(isFirstFetch ? connectionOption.getPairingKey() : keySpec.getSecondaryPassword());
                     object = new JSONObject(Crypto.decrypt(CompressStringUtil.decompressString(map.get(Value.ENCRYPTED_DATA)), keySpec));
 
                     Map<String, String> newMap = new ObjectMapper().readValue(object.toString(), Map.class);

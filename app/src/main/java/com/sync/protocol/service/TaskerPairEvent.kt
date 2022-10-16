@@ -82,7 +82,7 @@ class TaskerPairEvent : Activity(), TaskerPluginConfig<GetConfigInput> {
             var deviceSelection = 0
             val rawList = ArrayList<PairDeviceInfo>()
             val nameList = ArrayList<String>()
-            for (device in Protocol.getPairedDeviceList()) {
+            for (device in Protocol.getInstance().pairedDeviceList) {
                 rawList.add(device)
             }
 

@@ -25,7 +25,7 @@ public class Crypto {
      * @return encoded output
      * @throws GeneralSecurityException throws when error occurred during encrypt
      */
-    public static String encrypt(String plain, KeySpec keySpec) throws GeneralSecurityException {
+    public synchronized static String encrypt(String plain, KeySpec keySpec) throws GeneralSecurityException {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -57,7 +57,7 @@ public class Crypto {
      * @return decrypt output
      * @throws GeneralSecurityException throws when error occurred during decrypt
      */
-    public static String decrypt(String plain, KeySpec keySpec) throws GeneralSecurityException {
+    public synchronized static String decrypt(String plain, KeySpec keySpec) throws GeneralSecurityException {
         byte[] rawByteArray = Base64.decode(plain, Base64.NO_WRAP);
         byte[] iv = Arrays.copyOfRange(rawByteArray, 0, 16);
         byte[] cipherText;

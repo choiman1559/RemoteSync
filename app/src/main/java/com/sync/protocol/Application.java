@@ -17,7 +17,7 @@ public class Application extends android.app.Application {
         MonetCompat.enablePaletteCompat();
         SharedPreferences prefs = getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE);
 
-        Protocol.initialize(this, new PairActionListener());
+        Protocol instance = Protocol.initialize(this, new PairActionListener());
         ConnectionOption option = new ConnectionOption();
 
         option.setPairingKey(prefs.getString("UID", ""));
@@ -37,6 +37,6 @@ public class Application extends android.app.Application {
                 .build();
         option.setKeySpec(keySpec);
 
-        Protocol.setConnectionOption(option);
+        instance.setConnectionOption(option);
     }
 }
