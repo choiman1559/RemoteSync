@@ -39,7 +39,7 @@ final public class PairListener {
         PairListener.m_onDeviceListChangedListener = mOnDeviceListChangedListener;
     }
 
-    public static void addOnDataReceivedListener(onDataReceivedListener mOnDataReceivedListener) {
+    public synchronized static void addOnDataReceivedListener(onDataReceivedListener mOnDataReceivedListener) {
         if(!m_onDataReceivedListener.contains(mOnDataReceivedListener)) m_onDataReceivedListener.add(mOnDataReceivedListener);
     }
 

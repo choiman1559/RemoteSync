@@ -6,9 +6,7 @@ import com.sync.lib.action.PairAction;
 import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 
-import java.util.Map;
-
-public class PairActionListener extends PairAction {
+public class PairActionListener implements PairAction {
     @Override
     public void onFindRequest() {
         FirebaseMessageService.getInstance().sendFindTaskNotification();
@@ -31,7 +29,6 @@ public class PairActionListener extends PairAction {
 
     @Override
     public void onPairRemoved(PairDeviceInfo device) {
-        super.onPairRemoved(device);
         //Useless for now: Ignore this event
     }
 }
