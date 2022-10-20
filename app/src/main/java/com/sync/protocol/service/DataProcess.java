@@ -175,7 +175,7 @@ public class DataProcess {
 
                     new Thread(() -> {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
-                        StorageReference storageRef = storage.getReferenceFromUrl("gs://sync-protocol.appspot.com");
+                        StorageReference storageRef = storage.getReference();
                         StorageReference fileRef = storageRef.child(context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "") + "/" + actionArg);
 
                         try {

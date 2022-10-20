@@ -132,7 +132,7 @@ public class ShareDataActivity extends AppCompatActivity {
                             title.setText("Uploading file...");
 
                             FirebaseStorage storage = FirebaseStorage.getInstance();
-                            StorageReference storageRef = storage.getReferenceFromUrl("gs://sync-protocol.appspot.com");
+                            StorageReference storageRef = storage.getReference();
                             StorageReference fileRef = storageRef.child(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "") + "/" + name);
                             StorageMetadata metadata = new StorageMetadata.Builder().setContentType(type).build();
                             UploadTask uploadTask = fileRef.putFile(dataUri, metadata);
