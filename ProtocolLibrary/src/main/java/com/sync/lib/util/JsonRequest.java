@@ -13,7 +13,7 @@ public class JsonRequest {
     private RequestQueue requestQueue;
     private final Context ctx;
 
-    private JsonRequest(Context context) {
+    JsonRequest(Context context) {
         ctx = context;
         requestQueue = getRequestQueue();
     }
@@ -24,7 +24,7 @@ public class JsonRequest {
      * @param context Android application class context
      * @return A JsonRequest instance.
      */
-    protected static synchronized JsonRequest getInstance(Context context) {
+    public static synchronized JsonRequest getInstance(Context context) {
         if (instance == null) {
             instance = new JsonRequest(context);
         }
@@ -48,7 +48,7 @@ public class JsonRequest {
      * @param req Json request instance to query
      * @param <T> object type
      */
-    protected <T> void addToRequestQueue(Request<T> req) {
+    public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
 }

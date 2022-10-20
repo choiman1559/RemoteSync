@@ -3,10 +3,13 @@ package com.sync.protocol;
 import android.content.SharedPreferences;
 
 import com.kieronquinn.monetcompat.core.MonetCompat;
+
 import com.sync.lib.Protocol;
 import com.sync.lib.data.ConnectionOption;
 import com.sync.lib.data.KeySpec;
+
 import com.sync.protocol.service.PairActionListener;
+import com.sync.protocol.service.RequestListener;
 import com.sync.protocol.utils.DataUtils;
 
 public class Application extends android.app.Application {
@@ -28,6 +31,7 @@ public class Application extends android.app.Application {
         option.setAllowRemovePairRemotely(prefs.getBoolean("allowRemovePairRemotely", true));
         option.setAllowAcceptPairAutomatically(prefs.getBoolean("allowAcceptPairAutomatically", false));
         option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
+        if(prefs.getBoolean("useCustomPushProvider", false)) option.setRequestInvoker(new RequestListener());
 
         option.setEncryptionEnabled(prefs.getBoolean("UseDataEncryption", false));
         KeySpec keySpec = new KeySpec.Builder()

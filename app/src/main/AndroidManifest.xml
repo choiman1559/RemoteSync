@@ -29,12 +29,12 @@
         android:theme="@style/Theme.App.Palette">
 
         <activity android:name=".ui.ExitActivity" />
-        <activity android:name=".ui.activity.PairAcceptActivity"
+        <activity android:name=".ui.pair.PairAcceptActivity"
             android:theme="@style/Theme.App.Palette.Dialog"/>
-        <activity android:name=".ui.activity.PairMainActivity"
+        <activity android:name=".ui.pair.PairMainActivity"
             android:exported="true"/>
-        <activity android:name=".ui.activity.PairingActivity"/>
-        <activity android:name=".ui.activity.PairDetailActivity"/>
+        <activity android:name=".ui.pair.PairingActivity"/>
+        <activity android:name=".ui.pair.PairDetailActivity"/>
         <activity android:name=".ui.RequestActionActivity"/>
         <activity android:name=".ui.OptionActivity"/>
 
@@ -76,7 +76,7 @@
         </activity>
 
         <activity
-            android:name=".StartActivity"
+            android:name=".ui.StartActivity"
             android:theme="@style/Theme.App.Palette"
             android:exported="true">
             <intent-filter>

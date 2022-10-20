@@ -1,4 +1,4 @@
-package com.sync.protocol;
+package com.sync.protocol.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -33,8 +33,9 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.sync.protocol.ui.ToastHelper;
-import com.sync.protocol.ui.activity.PairMainActivity;
+import com.sync.protocol.BuildConfig;
+import com.sync.protocol.R;
+import com.sync.protocol.ui.pair.PairMainActivity;
 
 import java.net.NetworkInterface;
 import java.util.Collections;

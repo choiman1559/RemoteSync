@@ -1,5 +1,12 @@
 package com.sync.lib.data;
 
+import android.content.Context;
+
+import com.sync.lib.task.RequestInvoker;
+import com.sync.lib.task.RequestTask;
+
+import org.json.JSONObject;
+
 public class ConnectionOption {
     private String pairingKey;
     private String identifierValue;
@@ -11,6 +18,7 @@ public class ConnectionOption {
     private boolean allowAcceptPairAutomatically;
     private String serverKey;
     private KeySpec keySpec;
+    private RequestInvoker requestInvoker;
 
     public ConnectionOption() {
         encryptionEnabled = false;
@@ -22,6 +30,12 @@ public class ConnectionOption {
         identifierValue = "";
         serverKey = "";
         keySpec = new KeySpec();
+        requestInvoker = new RequestInvoker() {
+            @Override
+            public void requestJsonPost(String PackageName, Context context, JSONObject notification, RequestTask task) {
+                super.requestJsonPost(PackageName, context, notification, task);
+            }
+        };
     }
 
     public void setServerKey(String serverKey) {
@@ -65,6 +79,10 @@ public class ConnectionOption {
         this.keySpec = keySpec;
     }
 
+    public void setRequestInvoker(RequestInvoker requestInvoker) {
+        this.requestInvoker = requestInvoker;
+    }
+
     public boolean isEncryptionEnabled() {
         return encryptionEnabled;
     }
@@ -95,6 +113,10 @@ public class ConnectionOption {
 
     public String getServerKey() {
         return serverKey;
+    }
+
+    public RequestInvoker getRequestInvoker() {
+        return requestInvoker;
     }
 
     public boolean isAllowRemovePairRemotely() {

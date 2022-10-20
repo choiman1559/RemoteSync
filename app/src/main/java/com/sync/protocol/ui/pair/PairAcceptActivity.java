@@ -1,4 +1,4 @@
-package com.sync.protocol.ui.activity;
+package com.sync.protocol.ui.pair;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

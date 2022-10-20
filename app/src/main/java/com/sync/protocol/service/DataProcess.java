@@ -37,7 +37,7 @@ import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.Value;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
-import com.sync.protocol.ui.activity.PairAcceptActivity;
+import com.sync.protocol.ui.pair.PairAcceptActivity;
 import com.sync.protocol.utils.AsyncTask;
 import com.sync.protocol.utils.PowerUtils;
 
@@ -47,7 +47,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 
 public class DataProcess {
     public static void onDataRequested(Data map, Context context) {
@@ -176,7 +175,7 @@ public class DataProcess {
 
                     new Thread(() -> {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
-                        StorageReference storageRef = storage.getReferenceFromUrl("gs://notisender-41c1b.appspot.com");
+                        StorageReference storageRef = storage.getReferenceFromUrl("gs://sync-protocol.appspot.com");
                         StorageReference fileRef = storageRef.child(context.getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "") + "/" + actionArg);
 
                         try {
@@ -211,7 +210,7 @@ public class DataProcess {
                                     ContentResolver resolver = context.getContentResolver();
                                     ContentValues contentValues = new ContentValues();
                                     contentValues.put(MediaStore.Downloads.DISPLAY_NAME, actionArg);
-                                    contentValues.put(MediaStore.Downloads.RELATIVE_PATH, "Download/" + "NotiSender");
+                                    contentValues.put(MediaStore.Downloads.RELATIVE_PATH, "Download/" + "SyncProtocol");
                                     contentValues.put(MediaStore.Downloads.MIME_TYPE, storageMetadata.getContentType());
                                     contentValues.put(MediaStore.Downloads.IS_PENDING, true);
                                     Uri uri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);

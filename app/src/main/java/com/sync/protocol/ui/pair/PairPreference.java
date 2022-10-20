@@ -1,4 +1,4 @@
-package com.sync.protocol.ui;
+package com.sync.protocol.ui.pair;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -27,6 +27,8 @@ import com.sync.lib.Protocol;
 import com.sync.lib.data.ConnectionOption;
 import com.sync.lib.data.KeySpec;
 import com.sync.protocol.R;
+import com.sync.protocol.service.RequestListener;
+import com.sync.protocol.ui.ToastHelper;
 
 public class PairPreference extends PreferenceFragmentCompat  {
 
@@ -90,6 +92,7 @@ public class PairPreference extends PreferenceFragmentCompat  {
             option.setAllowRemovePairRemotely(prefs.getBoolean("allowRemovePairRemotely", true));
             option.setAllowAcceptPairAutomatically(prefs.getBoolean("allowAcceptPairAutomatically", false));
             option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
+            if(prefs.getBoolean("useCustomPushProvider", false)) option.setRequestInvoker(new RequestListener());
 
             option.setEncryptionEnabled(prefs.getBoolean("UseDataEncryption", false));
             KeySpec keySpec = new KeySpec.Builder()

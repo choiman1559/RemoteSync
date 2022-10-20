@@ -2,6 +2,7 @@ package com.sync.lib.process;
 
 import static com.sync.lib.action.PairListener.m_onDeviceFoundListener;
 import static com.sync.lib.action.PairListener.m_onDevicePairResultListener;
+import static com.sync.lib.util.DataUtils.getErrorResult;
 import static com.sync.lib.util.DataUtils.sendNotification;
 
 import android.content.Context;
@@ -11,6 +12,7 @@ import com.sync.lib.Protocol;
 import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.Value;
+import com.sync.lib.task.RequestTask;
 import com.sync.lib.util.DataUtils;
 
 import org.json.JSONException;
@@ -24,8 +26,9 @@ public class Process {
      * Initiation of pairing: request device information from all devices that can receive data
      *
      * @param context android context instance
+     * @return A RequestTask object to register a task completion listener
      */
-    public static void requestDeviceListWidely(Context context) {
+    public static RequestTask requestDeviceListWidely(Context context) {
         Protocol instance = Protocol.getInstance();
         instance.isFindingDeviceToPair = true;
         JSONObject notificationBody = new JSONObject();
@@ -35,10 +38,11 @@ public class Process {
             notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
             notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
         } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
+            return getErrorResult(e);
         }
-        sendNotification(notificationBody, "pair.func", context, true);
+
         if (isShowDebugLog()) Log.d("sync sent", "request list: " + notificationBody);
+        return sendNotification(notificationBody, "pair.func", context, true);
     }
 
     /**
@@ -46,8 +50,9 @@ public class Process {
      *
      * @param map Raw data from FCM
      * @param context android context instance
+     * @return A RequestTask object to register a task completion listener
      */
-    public static void responseDeviceInfoToFinder(Data map, Context context) {
+    public static RequestTask responseDeviceInfoToFinder(Data map, Context context) {
         Protocol instance = Protocol.getInstance();
         JSONObject notificationBody = new JSONObject();
         PairDeviceInfo device = map.getDevice();
@@ -59,10 +64,11 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
+            return getErrorResult(e);
         }
-        sendNotification(notificationBody, "pair.func", context);
+
         if (isShowDebugLog()) Log.d("sync sent", "response list: " + notificationBody);
+        return sendNotification(notificationBody, "pair.func", context);
     }
 
     /**
@@ -79,8 +85,9 @@ public class Process {
      *
      * @param device target device to request pair
      * @param context android context instance
+     * @return A RequestTask object to register a task completion listener
      */
-    public static void requestPair(PairDeviceInfo device, Context context) {
+    public static RequestTask requestPair(PairDeviceInfo device, Context context) {
         Protocol instance = Protocol.getInstance();
         JSONObject notificationBody = new JSONObject();
         try {
@@ -90,10 +97,11 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
+            return getErrorResult(e);
         }
-        sendNotification(notificationBody, "pair.func", context);
+
         if (isShowDebugLog()) Log.d("sync sent", "request pair: " + notificationBody);
+        return sendNotification(notificationBody, "pair.func", context);
     }
 
     /**
@@ -102,8 +110,9 @@ public class Process {
      * @param device target device to response pair
      * @param isAccepted Whether the user accepts the pairing
      * @param context android context instance
+     * @return A RequestTask object to register a task completion listener
      */
-    public static void responsePairAcceptation(PairDeviceInfo device, boolean isAccepted, Context context) {
+    public static RequestTask responsePairAcceptation(PairDeviceInfo device, boolean isAccepted, Context context) {
         Protocol instance = Protocol.getInstance();
         if (isAccepted) {
             registerDevice(device);
@@ -125,10 +134,10 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.PAIR_ACCEPT.id(), isAccepted ? "true" : "false");
         } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
+            return getErrorResult(e);
         }
 
-        DataUtils.sendNotification(notificationBody, "pair.func", context);
+        return DataUtils.sendNotification(notificationBody, "pair.func", context);
     }
 
     /**
@@ -190,8 +199,9 @@ public class Process {
      *
      * @param device target device to disconnect pair
      * @param context android context instance
+     * @return A RequestTask object to register a task completion listener
      */
-    public static void requestRemovePair(Context context, PairDeviceInfo device) {
+    public static RequestTask requestRemovePair(Context context, PairDeviceInfo device) {
         Protocol instance = Protocol.getInstance();
         removePairedDevice(device, false);
         JSONObject notificationBody = new JSONObject();
@@ -203,10 +213,10 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
-            Log.e("Noti", "onCreate: " + e.getMessage());
+            return getErrorResult(e);
         }
-        sendNotification(notificationBody, "pair.func", context);
         if (isShowDebugLog()) Log.d("sync sent", "request remove: " + notificationBody);
+        return sendNotification(notificationBody, "pair.func", context);
     }
 
     private static boolean isShowDebugLog() {
