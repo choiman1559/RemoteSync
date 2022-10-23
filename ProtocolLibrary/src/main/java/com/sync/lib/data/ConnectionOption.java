@@ -29,7 +29,7 @@ public class ConnectionOption {
         pairingKey = "";
         identifierValue = "";
         serverKey = "";
-        keySpec = new KeySpec();
+        keySpec = new KeySpec.Builder().build();
         requestInvoker = new RequestInvoker() {
             @Override
             public void requestJsonPost(String PackageName, Context context, JSONObject notification, RequestTask task) {

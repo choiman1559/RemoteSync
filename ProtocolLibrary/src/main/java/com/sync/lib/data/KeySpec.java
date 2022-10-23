@@ -9,7 +9,7 @@ public class KeySpec {
     private boolean authWithHMac;
     private boolean isSymmetric;
 
-    KeySpec() {
+    private KeySpec() {
         encryptionPassword = "";
         secondaryPassword = "";
         authWithHMac = false;
