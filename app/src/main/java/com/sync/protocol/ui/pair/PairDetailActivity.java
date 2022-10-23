@@ -67,12 +67,12 @@ public class PairDetailActivity extends AppCompatActivity {
         deviceIdInfo.setText("Device's unique address: " + Device_id);
 
         forgetButton.setOnClickListener(v -> {
-            Process.requestRemovePair(this, Device_info);
+            Process.requestRemovePair(Device_info);
             finish();
         });
 
         findButton.setOnClickListener(v -> {
-            DataUtils.sendFindTaskNotification(this, Device_info);
+            DataUtils.sendFindTaskNotification(Device_info);
             ToastHelper.show(this, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
         });
 
@@ -80,7 +80,7 @@ public class PairDetailActivity extends AppCompatActivity {
         testSpeedLayout.setVisibility(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getBoolean("printDebugLog", false) ? View.VISIBLE : View.GONE);
         testSpeedLayout.setOnClickListener((v) -> {
             currentTime.set(Calendar.getInstance().getTimeInMillis());
-            DataUtils.requestData(this, Device_info, "speed_test");
+            DataUtils.requestData(Device_info, "speed_test");
         });
 
         PairListener.addOnDataReceivedListener(map -> {
@@ -131,6 +131,6 @@ public class PairDetailActivity extends AppCompatActivity {
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener((v) -> this.finish());
-        DataUtils.requestData(this, Device_info, "battery_info");
+        DataUtils.requestData(Device_info, "battery_info");
     }
 }

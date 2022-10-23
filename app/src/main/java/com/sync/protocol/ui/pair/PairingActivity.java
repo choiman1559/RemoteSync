@@ -82,7 +82,7 @@ public class PairingActivity extends AppCompatActivity {
             }
         });
 
-        Process.requestDeviceListWidely(this);
+        Process.requestDeviceListWidely();
         deviceName.setText(Build.MODEL);
         deviceId.setText("Phone's Unique address: " + DataUtils.getUniqueID(this));
 
@@ -103,7 +103,7 @@ public class PairingActivity extends AppCompatActivity {
         holder.icon.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(colorLow[randomIndex])));
 
         layout.setOnClickListener(v -> {
-            Process.requestPair(device, PairingActivity.this);
+            Process.requestPair(device);
             progress.setVisibility(View.GONE);
 
             holder.pairStatus.setText("Connecting...");

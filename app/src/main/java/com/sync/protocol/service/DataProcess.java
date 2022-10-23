@@ -76,7 +76,7 @@ public class DataProcess {
         }
 
         if (!dataToSend.isEmpty()) {
-            DataUtils.responseDataRequest(map.getDevice(), dataType, dataToSend, context);
+            DataUtils.responseDataRequest(map.getDevice(), dataType, dataToSend);
         }
     }
 
@@ -180,7 +180,7 @@ public class DataProcess {
 
                         try {
                             if (Build.VERSION.SDK_INT < 29) {
-                                File targetFile = new File(Environment.getExternalStorageDirectory(), "Download/NotiSender/" + actionArg);
+                                File targetFile = new File(Environment.getExternalStorageDirectory(), "Download/SyncProtocol/" + actionArg);
                                 targetFile.mkdirs();
                                 if (targetFile.exists()) targetFile.delete();
                                 targetFile.createNewFile();

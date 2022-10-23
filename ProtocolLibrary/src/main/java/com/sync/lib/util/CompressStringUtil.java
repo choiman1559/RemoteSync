@@ -9,7 +9,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class CompressStringUtil {
-    private static final String charsetName = "UTF-8";
+    private static final String CharsetName = "UTF-8";
 
     /**
      * compress string using DeflaterOutputStream
@@ -48,7 +48,7 @@ public class CompressStringUtil {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             OutputStream out = new DeflaterOutputStream(baos);
-            out.write(text.getBytes(charsetName));
+            out.write(text.getBytes(CharsetName));
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,7 +64,7 @@ public class CompressStringUtil {
             byte[] buffer = new byte[8192];
             int len;
             while ((len = in.read(buffer)) > 0) baos.write(buffer, 0, len);
-            return baos.toString(charsetName);
+            return baos.toString(CharsetName);
         } catch (IOException e) {
             e.printStackTrace();
             throw new AssertionError(e);

@@ -2,10 +2,9 @@ package com.sync.lib.process;
 
 import static com.sync.lib.action.PairListener.m_onDeviceFoundListener;
 import static com.sync.lib.action.PairListener.m_onDevicePairResultListener;
-import static com.sync.lib.util.DataUtils.getErrorResult;
+import static com.sync.lib.util.DataUtils.pushErrorResultToListener;
 import static com.sync.lib.util.DataUtils.sendNotification;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.sync.lib.Protocol;
@@ -25,10 +24,9 @@ public class Process {
     /**
      * Initiation of pairing: request device information from all devices that can receive data
      *
-     * @param context android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask requestDeviceListWidely(Context context) {
+    public static RequestTask requestDeviceListWidely() {
         Protocol instance = Protocol.getInstance();
         instance.isFindingDeviceToPair = true;
         JSONObject notificationBody = new JSONObject();
@@ -38,21 +36,20 @@ public class Process {
             notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
             notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
 
         if (isShowDebugLog()) Log.d("sync sent", "request list: " + notificationBody);
-        return sendNotification(notificationBody, "pair.func", context, true);
+        return sendNotification(notificationBody, true);
     }
 
     /**
      * When a device send request is received, this device's information is sent to the device that sent the request.
      *
      * @param map Raw data from FCM
-     * @param context android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask responseDeviceInfoToFinder(Data map, Context context) {
+    public static RequestTask responseDeviceInfoToFinder(Data map) {
         Protocol instance = Protocol.getInstance();
         JSONObject notificationBody = new JSONObject();
         PairDeviceInfo device = map.getDevice();
@@ -64,11 +61,11 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
 
         if (isShowDebugLog()) Log.d("sync sent", "response list: " + notificationBody);
-        return sendNotification(notificationBody, "pair.func", context);
+        return sendNotification(notificationBody);
     }
 
     /**
@@ -84,10 +81,9 @@ public class Process {
      * When a device send request is received, this device's information is sent to the device that sent the request.
      *
      * @param device target device to request pair
-     * @param context android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask requestPair(PairDeviceInfo device, Context context) {
+    public static RequestTask requestPair(PairDeviceInfo device) {
         Protocol instance = Protocol.getInstance();
         JSONObject notificationBody = new JSONObject();
         try {
@@ -97,11 +93,11 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
 
         if (isShowDebugLog()) Log.d("sync sent", "request pair: " + notificationBody);
-        return sendNotification(notificationBody, "pair.func", context);
+        return sendNotification(notificationBody);
     }
 
     /**
@@ -109,10 +105,9 @@ public class Process {
      *
      * @param device target device to response pair
      * @param isAccepted Whether the user accepts the pairing
-     * @param context android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask responsePairAcceptation(PairDeviceInfo device, boolean isAccepted, Context context) {
+    public static RequestTask responsePairAcceptation(PairDeviceInfo device, boolean isAccepted) {
         Protocol instance = Protocol.getInstance();
         if (isAccepted) {
             registerDevice(device);
@@ -134,10 +129,10 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.PAIR_ACCEPT.id(), isAccepted ? "true" : "false");
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
 
-        return DataUtils.sendNotification(notificationBody, "pair.func", context);
+        return DataUtils.sendNotification(notificationBody);
     }
 
     /**
@@ -198,10 +193,9 @@ public class Process {
      * Send an unpairing request to another device.
      *
      * @param device target device to disconnect pair
-     * @param context android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask requestRemovePair(Context context, PairDeviceInfo device) {
+    public static RequestTask requestRemovePair(PairDeviceInfo device) {
         Protocol instance = Protocol.getInstance();
         removePairedDevice(device, false);
         JSONObject notificationBody = new JSONObject();
@@ -213,10 +207,10 @@ public class Process {
             notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
         if (isShowDebugLog()) Log.d("sync sent", "request remove: " + notificationBody);
-        return sendNotification(notificationBody, "pair.func", context);
+        return sendNotification(notificationBody);
     }
 
     private static boolean isShowDebugLog() {

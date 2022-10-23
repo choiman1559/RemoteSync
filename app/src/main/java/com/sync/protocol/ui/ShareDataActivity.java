@@ -90,7 +90,7 @@ public class ShareDataActivity extends AppCompatActivity {
                     } else if (taskSelectSpinner.getText().toString().isEmpty()) {
                         deviceSelectSpinner.setError("Please select action to execute");
                     } else {
-                        DataUtils.requestAction(this, rawList.get(deviceSelection.get()), taskSelectSpinner.getText().toString(), data);
+                        DataUtils.requestAction(rawList.get(deviceSelection.get()), taskSelectSpinner.getText().toString(), data);
                         dialog.dismiss();
                     }
                 });
@@ -152,7 +152,7 @@ public class ShareDataActivity extends AppCompatActivity {
                                 completeDialog.setPositiveButton("Close", (dialogInterface, i) -> finish());
                                 completeDialog.show();
 
-                                DataUtils.requestAction(this, rawList.get(deviceSelection.get()), "Share file", name);
+                                DataUtils.requestAction(rawList.get(deviceSelection.get()), "Share file", name);
                             });
 
                             uploadTask.addOnProgressListener(snapshot -> {

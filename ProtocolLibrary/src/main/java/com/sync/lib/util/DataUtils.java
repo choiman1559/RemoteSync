@@ -21,12 +21,10 @@ public class DataUtils {
      * Once processing is done, the data will be send to push server automatically
      *
      * @param notification Json data to send push server
-     * @param PackageName  Current working app's package name
-     * @param context      current Android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask sendNotification(JSONObject notification, String PackageName, Context context) {
-        return sendNotification(notification, PackageName, context, false);
+    public static RequestTask sendNotification(JSONObject notification) {
+        return sendNotification(notification, false);
     }
 
     /**
@@ -34,12 +32,10 @@ public class DataUtils {
      * Once processing is done, the data will be send to push server automatically
      *
      * @param notificationBody Json data to send push server
-     * @param PackageName      Current working app's package name
-     * @param context          current Android context instance
      * @param isFirstFetch     Whether or not you are pitching with the target device for the first time
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask sendNotification(JSONObject notificationBody, String PackageName, Context context, boolean isFirstFetch) {
+    public static RequestTask sendNotification(JSONObject notificationBody, boolean isFirstFetch) {
         Protocol instance = Protocol.getInstance();
         RequestTask task = new RequestTask();
 
@@ -78,7 +74,7 @@ public class DataUtils {
             return task;
         }
 
-        instance.connectionOption.getRequestInvoker().requestJsonPost(PackageName, context, notification, task);
+        instance.connectionOption.getRequestInvoker().requestJsonPost(notification, task);
         return task;
     }
 
@@ -86,10 +82,9 @@ public class DataUtils {
      * request find task to target device
      *
      * @param device  target device to send
-     * @param context current Android context instance
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask sendFindTaskNotification(Context context, PairDeviceInfo device) {
+    public static RequestTask sendFindTaskNotification(PairDeviceInfo device) {
         Protocol instance = Protocol.getInstance();
         Date date = Calendar.getInstance().getTime();
         JSONObject notificationBody = new JSONObject();
@@ -102,21 +97,20 @@ public class DataUtils {
             notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
             notificationBody.put(Value.SENT_DATE.id(), date);
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
 
-        return DataUtils.sendNotification(notificationBody, context.getPackageName(), context);
+        return DataUtils.sendNotification(notificationBody);
     }
 
     /**
      * request some data to target device
      *
      * @param device   target device to send
-     * @param context  current Android context instance
      * @param dataType type of data to request
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask requestData(Context context, PairDeviceInfo device, String dataType) {
+    public static RequestTask requestData(PairDeviceInfo device, String dataType) {
         Protocol instance = Protocol.getInstance();
         Date date = Calendar.getInstance().getTime();
         JSONObject notificationBody = new JSONObject();
@@ -130,21 +124,20 @@ public class DataUtils {
             notificationBody.put(Value.REQUEST_DATA.id(), dataType);
             notificationBody.put(Value.SENT_DATE.id(), date);
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
-        return DataUtils.sendNotification(notificationBody, context.getPackageName(), context);
+        return DataUtils.sendNotification(notificationBody);
     }
 
     /**
      * response to the device requesting the data
      *
      * @param device      target device to send
-     * @param context     current Android context instance
      * @param dataType    type of data requested
      * @param dataContent the value of the requested data
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask responseDataRequest(PairDeviceInfo device, String dataType, String dataContent, Context context) {
+    public static RequestTask responseDataRequest(PairDeviceInfo device, String dataType, String dataContent) {
         Protocol instance = Protocol.getInstance();
         Date date = Calendar.getInstance().getTime();
         JSONObject notificationBody = new JSONObject();
@@ -159,21 +152,20 @@ public class DataUtils {
             notificationBody.put(Value.REQUEST_DATA.id(), dataType);
             notificationBody.put(Value.SENT_DATE.id(), date);
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
-        return DataUtils.sendNotification(notificationBody, context.getPackageName(), context);
+        return DataUtils.sendNotification(notificationBody);
     }
 
     /**
      * request some action to target device
      *
      * @param device   target device to send
-     * @param context  current Android context instance
      * @param dataType type of data requested
      * @param args     Argument data required to execute the action
      * @return A RequestTask object to register a task completion listener
      */
-    public static RequestTask requestAction(Context context, PairDeviceInfo device, String dataType, String... args) {
+    public static RequestTask requestAction(PairDeviceInfo device, String dataType, String... args) {
         Protocol instance = Protocol.getInstance();
         StringBuilder dataToSend = new StringBuilder();
         if (args.length > 1) {
@@ -197,12 +189,12 @@ public class DataUtils {
             if (args.length > 0)
                 notificationBody.put(Value.ACTION_ARGS.id(), dataToSend.toString());
         } catch (JSONException e) {
-            return getErrorResult(e);
+            return pushErrorResultToListener(e);
         }
-        return DataUtils.sendNotification(notificationBody, context.getPackageName(), context);
+        return DataUtils.sendNotification(notificationBody);
     }
 
-    public static RequestTask getErrorResult(Exception e) {
+    public static RequestTask pushErrorResultToListener(Exception e) {
         RequestTask task = new RequestTask();
         task.onError(e);
         return task;

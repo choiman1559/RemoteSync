@@ -91,11 +91,11 @@ public class RequestActionActivity extends AppCompatActivity {
             } else {
                 RequestTask task;
                 if (taskArgs0.getVisibility() == View.VISIBLE && taskArgs1.getVisibility() == View.VISIBLE) {
-                    task = DataUtils.requestAction(this, Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
+                    task = DataUtils.requestAction(Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
                 } else if (taskArgs0.getVisibility() == View.VISIBLE) {
-                    task = DataUtils.requestAction(this, Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
+                    task = DataUtils.requestAction(Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
                 } else {
-                    task = DataUtils.requestAction(this, Device_info, taskSelectSpinner.getText().toString());
+                    task = DataUtils.requestAction(Device_info, taskSelectSpinner.getText().toString());
                 }
 
                 task.setOnSuccessListener(response -> {

@@ -37,7 +37,7 @@ public class PairAcceptActivity extends AppCompatActivity {
     }
 
     public static void sendAcceptedMessage(String Device_name, String Device_id, boolean isAccepted, Context context) {
-        Process.responsePairAcceptation(new PairDeviceInfo(Device_name, Device_id), isAccepted, context);
+        Process.responsePairAcceptation(new PairDeviceInfo(Device_name, Device_id), isAccepted);
         ExitActivity.exitApplication(context);
     }
 }

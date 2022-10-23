@@ -1,32 +1,29 @@
 package com.sync.lib.util;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.sync.lib.Protocol;
 
 public class JsonRequest {
     @SuppressLint("StaticFieldLeak")
     private static JsonRequest instance;
     private RequestQueue requestQueue;
-    private final Context ctx;
 
-    JsonRequest(Context context) {
-        ctx = context;
+    JsonRequest() {
         requestQueue = getRequestQueue();
     }
 
     /**
      * initialize class if instance is not available, then return instance
      *
-     * @param context Android application class context
      * @return A JsonRequest instance.
      */
-    public static synchronized JsonRequest getInstance(Context context) {
+    public static synchronized JsonRequest getInstance() {
         if (instance == null) {
-            instance = new JsonRequest(context);
+            instance = new JsonRequest();
         }
         return instance;
     }
@@ -38,7 +35,7 @@ public class JsonRequest {
      */
     protected RequestQueue getRequestQueue() {
         if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
+            requestQueue = Volley.newRequestQueue(Protocol.getInstance().applicationContext);
         }
         return requestQueue;
     }

@@ -34,7 +34,7 @@ public class ProcessUtil {
                         if (!isPairedDevice(map) || instance.connectionOption.isShowAlreadyConnected()) {
                             instance.pairingProcessList.add(device);
                             instance.isListeningToPair = true;
-                            Process.responseDeviceInfoToFinder(map, context);
+                            Process.responseDeviceInfoToFinder(map);
                         }
                         break;
 
@@ -54,7 +54,7 @@ public class ProcessUtil {
                             for (PairDeviceInfo info : instance.pairingProcessList) {
                                 if (info.equals(device)) {
                                     if(instance.connectionOption.isAllowAcceptPairAutomatically()) {
-                                        Process.responsePairAcceptation(device, true, context);
+                                        Process.responsePairAcceptation(device, true);
                                     } else {
                                         instance.action.showPairChoiceAction(map, context);
                                     }
