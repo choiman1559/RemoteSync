@@ -25,6 +25,7 @@ import com.sync.lib.data.Value;
 import com.sync.lib.process.Process;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
+import com.sync.protocol.ui.PresentationActivity;
 import com.sync.protocol.ui.ToastHelper;
 
 import java.util.Calendar;
@@ -56,6 +57,7 @@ public class PairDetailActivity extends AppCompatActivity {
         LinearLayout batterySaveEnabled = findViewById(R.id.batterySaveEnabled);
         LinearLayout batteryLayout = findViewById(R.id.batteryLayout);
         LinearLayout testSpeedLayout = findViewById(R.id.testSpeedLayout);
+        LinearLayout remotePresentation = findViewById(R.id.remotePresentation);
 
         String[] colorLow = getResources().getStringArray(R.array.material_color_low);
         String[] colorHigh = getResources().getStringArray(R.array.material_color_high);
@@ -74,6 +76,13 @@ public class PairDetailActivity extends AppCompatActivity {
         findButton.setOnClickListener(v -> {
             DataUtils.sendFindTaskNotification(Device_info);
             ToastHelper.show(this, "Your request is posted!","OK", ToastHelper.LENGTH_SHORT);
+        });
+
+        remotePresentation.setOnClickListener(v -> {
+            Intent remotePresentationIntent = new Intent(this, PresentationActivity.class);
+            remotePresentationIntent.putExtra("device_name", Device_name);
+            remotePresentationIntent.putExtra("device_id", Device_id);
+           startActivity(remotePresentationIntent);
         });
 
         AtomicLong currentTime = new AtomicLong();
@@ -102,7 +111,7 @@ public class PairDetailActivity extends AppCompatActivity {
 
                     case "battery_info":
                         String[] data = Objects.requireNonNull(map.get(Value.RECEIVE_DATA)).split("\\|");
-                        int batteryInt = data[0].equals("undefined") ? 0 : Integer.parseInt(data[0]);
+                        int batteryInt = data[0].equals("undefined") ? 0 : Math.round(Float.parseFloat(data[0]));
                         int resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_warning_24_regular;
 
                         if(batteryInt < 10) resId = com.microsoft.fluent.mobile.icons.R.drawable.ic_fluent_battery_0_24_regular;

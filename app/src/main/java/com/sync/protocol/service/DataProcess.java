@@ -37,6 +37,7 @@ import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.Value;
 import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
+import com.sync.protocol.ui.PresentationActivity;
 import com.sync.protocol.ui.pair.PairAcceptActivity;
 import com.sync.protocol.utils.AsyncTask;
 import com.sync.protocol.utils.PowerUtils;
@@ -141,14 +142,19 @@ public class DataProcess {
 
                 case "Run command":
                     final String[] finalActionArgs = actionArgs;
+                    final String args = String.join("", actionArgs);
                     new Thread(() -> {
                         try {
                             if (finalActionArgs.length > 0)
-                                Runtime.getRuntime().exec(finalActionArgs);
+                                Runtime.getRuntime().exec("echo 'hello'");
                         } catch (RuntimeException | IOException e) {
                             e.printStackTrace();
                         }
                     }).start();
+                    break;
+
+                case PresentationActivity.ACTION_NAME:
+                    
                     break;
 
                 case "Share file":

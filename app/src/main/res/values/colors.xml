@@ -18,6 +18,9 @@
     <color name="ui_fg_secondary">#5E5E5E</color>
     <color name="ui_accent">#006C5F</color>
 
+    <color name="ui_widget_tertiary">#FFFFD8E4</color>
+    <color name="ui_widget_secondary">#FFE8DEF8</color>
+
     <color name="launcher_fg">#464646</color>
     <color name="launcher_bg">#8DF5E3</color>
 

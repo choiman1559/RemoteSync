@@ -37,6 +37,8 @@
         <activity android:name=".ui.pair.PairDetailActivity"/>
         <activity android:name=".ui.RequestActionActivity"/>
         <activity android:name=".ui.OptionActivity"/>
+        <activity android:name=".ui.PresentationActivity"
+            android:theme="@style/Theme.App.Material3" />
 
         <activity
             android:label="Share Data"
