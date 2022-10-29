@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="@color/ui_bg"
+    android:backgroundTint="@color/ui_bg_toolbar"
     android:orientation="vertical"
     tools:ignore="SpeakableTextPresentCheck">
 
@@ -26,21 +26,29 @@
             app:statusBarForeground="@android:color/transparent" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="280dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_fluent_device_meeting_room_remote_48_selector"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="10dp"
+        app:tint="@color/ui_bg_icon"
+        tools:ignore="ContentDescription" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="50dp"
-        android:layout_marginVertical="200dp"
-        android:paddingVertical="50dp"
-        android:background="@drawable/round_corner"
-        android:backgroundTint="@color/ui_widget_background"
         android:orientation="vertical"
-        android:layout_gravity="center|top">
+        android:layout_gravity="top">
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
         android:background="@drawable/round_corner"
@@ -70,6 +78,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@drawable/dialog_background"
+        android:backgroundTint="@color/ui_bg"
+        android:paddingTop="24dp"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -121,7 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginVertical="24dp">
+            android:layout_marginVertical="12dp">
 
             <Button
                 android:id="@+id/previousButton"

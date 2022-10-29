@@ -71,9 +71,9 @@
     </style>
 
     <style name="Theme.App.Material3" parent="Theme.Material3.DayNight.NoActionBar" >
-        <item name="android:colorBackground">@color/ui_bg</item>
+        <item name="android:colorBackground">@color/ui_bg_toolbar</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/ui_bg</item>
     </style>
 
     <style name="TextAppearance.App.CollapsingToolbar.Expanded" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
