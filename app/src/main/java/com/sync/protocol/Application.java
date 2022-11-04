@@ -8,6 +8,7 @@ import com.sync.lib.Protocol;
 import com.sync.lib.data.ConnectionOption;
 import com.sync.lib.data.KeySpec;
 
+import com.sync.protocol.service.DataReadWriteImpl;
 import com.sync.protocol.service.PairActionListener;
 import com.sync.protocol.service.RequestListener;
 import com.sync.protocol.utils.DataUtils;
@@ -32,6 +33,7 @@ public class Application extends android.app.Application {
         option.setAllowAcceptPairAutomatically(prefs.getBoolean("allowAcceptPairAutomatically", false));
         option.setServerKey("key=AAAARkkdxoQ:APA91bFH_JU9abB0B7OJT-fW0rVjDac-ny13ifdjLU9VqFPp0akohPNVZvfo6mBTFBddcsbgo-pFvtYEyQ62Ohb_arw1GjEqEl4Krc7InJXTxyGqPUkz-VwgTsGzP8Gv_5ZfuqICk7S2");
         if(prefs.getBoolean("useCustomPushProvider", false)) option.setRequestInvoker(new RequestListener());
+        if(prefs.getBoolean("useCustomDataReadWriter", false)) option.setDataReadWriter(new DataReadWriteImpl());
 
         option.setEncryptionEnabled(prefs.getBoolean("UseDataEncryption", false));
         KeySpec keySpec = new KeySpec.Builder()
