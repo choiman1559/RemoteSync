@@ -19,6 +19,7 @@ import com.sync.lib.data.Value;
 import com.sync.lib.process.ProcessUtil;
 import com.sync.lib.util.Crypto;
 import com.sync.lib.util.CompressStringUtil;
+import com.sync.lib.util.DataReadWriter;
 
 import org.json.JSONObject;
 
@@ -44,7 +45,7 @@ public class Protocol {
     public PairDeviceInfo thisDevice;
 
     static SharedPreferences.OnSharedPreferenceChangeListener onChange = ((sharedPreferences, key) -> {
-        if(instance != null && key.equals("paired_list")) {
+        if(instance != null && key.equals(DataReadWriter.DEFAULT_DATASET_KEY)) {
             PairListener.m_onDeviceListChangedListener.onReceive(instance.getPairedDeviceList());
         }
     });
@@ -116,7 +117,7 @@ public class Protocol {
      * @return current ArrayList<PairDeviceInfo> object
      */
     public ArrayList<PairDeviceInfo> getPairedDeviceList() {
-        Set<String> array = this.pairPrefs.getStringSet("paired_list", new HashSet<>());
+        Set<String> array = connectionOption.getDataReadWriter().readData(DataReadWriter.DEFAULT_DATASET_KEY);
         ArrayList<PairDeviceInfo> list = new ArrayList<>();
         for(String str : array) {
             String[] data = str.split("\\|");

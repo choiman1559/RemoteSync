@@ -9,6 +9,7 @@ import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.PairDeviceStatus;
 import com.sync.lib.data.Value;
+import com.sync.lib.util.DataReadWriter;
 
 import java.util.HashSet;
 
@@ -153,8 +154,9 @@ public class ProcessUtil {
      * @param map raw data received from push server
      */
     protected static boolean isPairedDevice(Data map) {
+        Protocol instance = Protocol.getInstance();
         String dataToFind = map.getDevice().toString();
-        for (String str : Protocol.getInstance().pairPrefs.getStringSet("paired_list", new HashSet<>())) {
+        for (String str : instance.connectionOption.getDataReadWriter().readData(DataReadWriter.DEFAULT_DATASET_KEY)) {
             if (str.equals(dataToFind)) return true;
         }
         return false;

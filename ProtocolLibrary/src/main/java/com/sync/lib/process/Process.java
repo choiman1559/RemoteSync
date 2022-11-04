@@ -12,6 +12,7 @@ import com.sync.lib.data.Data;
 import com.sync.lib.data.PairDeviceInfo;
 import com.sync.lib.data.Value;
 import com.sync.lib.task.RequestTask;
+import com.sync.lib.util.DataReadWriter;
 import com.sync.lib.util.DataUtils;
 
 import org.json.JSONException;
@@ -145,7 +146,7 @@ public class Process {
         boolean isNotRegistered = true;
         String dataToSave = device.toString();
 
-        Set<String> list = new HashSet<>(instance.pairPrefs.getStringSet("paired_list", new HashSet<>()));
+        Set<String> list = new HashSet<>(instance.connectionOption.getDataReadWriter().readData(DataReadWriter.DEFAULT_DATASET_KEY));
         for(String str : list) {
             if(str.equals(dataToSave)) {
                 isNotRegistered = false;
@@ -155,7 +156,7 @@ public class Process {
 
         if(isNotRegistered) {
             list.add(dataToSave);
-            instance.pairPrefs.edit().putStringSet("paired_list", list).apply();
+            instance.connectionOption.getDataReadWriter().writeData(DataReadWriter.DEFAULT_DATASET_KEY, list);
         }
     }
 
@@ -183,9 +184,9 @@ public class Process {
      */
     public static void removePairedDevice(PairDeviceInfo device, boolean haveToAnnounce) {
         Protocol instance = Protocol.getInstance();
-        Set<String> list = new HashSet<>(Protocol.getInstance().pairPrefs.getStringSet("paired_list", new HashSet<>()));
+        Set<String> list = new HashSet<>(instance.connectionOption.getDataReadWriter().readData(DataReadWriter.DEFAULT_DATASET_KEY));
         list.remove(device.toString());
-        instance.pairPrefs.edit().putStringSet("paired_list", list).apply();
+        instance.connectionOption.getDataReadWriter().writeData(DataReadWriter.DEFAULT_DATASET_KEY, list);
         if(haveToAnnounce) instance.action.onPairRemoved(device);
     }
 

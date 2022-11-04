@@ -1,7 +1,5 @@
 package com.sync.protocol.service;
 
-import android.content.Context;
-
 import com.sync.lib.task.RequestInvoker;
 import com.sync.lib.task.RequestTask;
 

@@ -4,8 +4,12 @@ import android.content.Context;
 
 import com.sync.lib.task.RequestInvoker;
 import com.sync.lib.task.RequestTask;
+import com.sync.lib.util.DataReadWriter;
 
 import org.json.JSONObject;
+
+import java.util.Collection;
+import java.util.Set;
 
 public class ConnectionOption {
     private String pairingKey;
@@ -19,6 +23,7 @@ public class ConnectionOption {
     private String serverKey;
     private KeySpec keySpec;
     private RequestInvoker requestInvoker;
+    private DataReadWriter dataReadWriter;
 
     public ConnectionOption() {
         encryptionEnabled = false;
@@ -34,6 +39,23 @@ public class ConnectionOption {
             @Override
             public void requestJsonPost(JSONObject notification, RequestTask task) {
                 super.requestJsonPost(notification, task);
+            }
+        };
+
+        dataReadWriter = new DataReadWriter() {
+            @Override
+            public Set<String> readData(String key) {
+                return super.readData(key);
+            }
+
+            @Override
+            public Set<String> readData(String key, Collection<String> defaultValue) {
+                return super.readData(key, defaultValue);
+            }
+
+            @Override
+            public void writeData(String key, Collection<String> value) {
+                super.writeData(key, value);
             }
         };
     }
@@ -83,6 +105,10 @@ public class ConnectionOption {
         this.requestInvoker = requestInvoker;
     }
 
+    public void setDataReadWriter(DataReadWriter dataReadWriter) {
+        this.dataReadWriter = dataReadWriter;
+    }
+
     public boolean isEncryptionEnabled() {
         return encryptionEnabled;
     }
@@ -117,6 +143,10 @@ public class ConnectionOption {
 
     public RequestInvoker getRequestInvoker() {
         return requestInvoker;
+    }
+
+    public DataReadWriter getDataReadWriter() {
+        return dataReadWriter;
     }
 
     public boolean isAllowRemovePairRemotely() {
