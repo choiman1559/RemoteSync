@@ -1,7 +1,5 @@
 package com.sync.lib.data;
 
-import android.content.Context;
-
 import com.sync.lib.task.RequestInvoker;
 import com.sync.lib.task.RequestTask;
 import com.sync.lib.util.DataReadWriter;
@@ -12,6 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public class ConnectionOption {
+    private String serverKey;
     private String pairingKey;
     private String identifierValue;
     private boolean encryptionEnabled;
@@ -20,7 +19,6 @@ public class ConnectionOption {
     private boolean isReceiveFindRequest;
     private boolean allowRemovePairRemotely;
     private boolean allowAcceptPairAutomatically;
-    private String serverKey;
     private KeySpec keySpec;
     private RequestInvoker requestInvoker;
     private DataReadWriter dataReadWriter;

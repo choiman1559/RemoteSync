@@ -115,7 +115,7 @@ public class ShareDataActivity extends AppCompatActivity {
                     long size = returnCursor2.getLong(sizeIndex);
                     returnCursor2.close();
 
-                    if (size > 104857600) {
+                    if (size > 3221225472L) {
                         fileTooBigWarning.setVisibility(View.VISIBLE);
                         ok.setEnabled(false);
                     }

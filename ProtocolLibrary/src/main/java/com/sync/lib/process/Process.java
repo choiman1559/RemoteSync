@@ -86,19 +86,21 @@ public class Process {
      */
     public static RequestTask requestPair(PairDeviceInfo device) {
         Protocol instance = Protocol.getInstance();
-        JSONObject notificationBody = new JSONObject();
-        try {
-            notificationBody.put(Value.TYPE.id(), "pair|request_pair");
-            notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
-            notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
-            notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
-            notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
-        } catch (JSONException e) {
-            return pushErrorResultToListener(e);
-        }
+        if(instance.pairingProcessList.contains(device)) {
+            JSONObject notificationBody = new JSONObject();
+            try {
+                notificationBody.put(Value.TYPE.id(), "pair|request_pair");
+                notificationBody.put(Value.DEVICE_NAME.id(), instance.thisDevice.getDevice_name());
+                notificationBody.put(Value.DEVICE_ID.id(), instance.thisDevice.getDevice_id());
+                notificationBody.put(Value.SEND_DEVICE_NAME.id(), device.getDevice_name());
+                notificationBody.put(Value.SEND_DEVICE_ID.id(), device.getDevice_id());
+            } catch (JSONException e) {
+                return pushErrorResultToListener(e);
+            }
 
-        if (isShowDebugLog()) Log.d("sync sent", "request pair: " + notificationBody);
-        return sendNotification(notificationBody);
+            if (isShowDebugLog()) Log.d("sync sent", "request pair: " + notificationBody);
+            return sendNotification(notificationBody);
+        } else return pushErrorResultToListener(new IllegalStateException("Device that you're trying to connect is not on pairing progress!!!"));
     }
 
     /**
