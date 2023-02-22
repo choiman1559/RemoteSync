@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.sync.protocol.R;
+import com.sync.protocol.ui.pair.PairPreference;
 
 public class OptionActivity extends AppCompatActivity {
 

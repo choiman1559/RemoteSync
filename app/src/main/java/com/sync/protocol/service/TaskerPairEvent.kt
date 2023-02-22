@@ -23,6 +23,8 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultCondition
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultConditionSatisfied
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultConditionUnsatisfied
+import com.sync.lib.Protocol
+import com.sync.lib.data.PairDeviceInfo
 
 import com.sync.protocol.R
 
@@ -78,16 +80,15 @@ class TaskerPairEvent : Activity(), TaskerPluginConfig<GetConfigInput> {
             infoIcon.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_info_outline_black_24dp, theme))
 
             var deviceSelection = 0
-            val pairPrefs = context.getSharedPreferences("com.sync.protocol_pair", Context.MODE_PRIVATE)
-            val rawList = ArrayList<String>()
+            val rawList = ArrayList<PairDeviceInfo>()
             val nameList = ArrayList<String>()
-            for (str in pairPrefs.getStringSet("paired_list", HashSet<String>())!!) {
-                rawList.add(str)
+            for (device in Protocol.getInstance().pairedDeviceList) {
+                rawList.add(device)
             }
 
             nameList.add("Every device")
-            for (str in rawList) {
-                nameList.add(str.split("|")[0])
+            for (device in rawList) {
+                nameList.add(device.device_name)
             }
 
             deviceSelectSpinner.setAdapter<ArrayAdapter<String>>(
@@ -106,9 +107,9 @@ class TaskerPairEvent : Activity(), TaskerPluginConfig<GetConfigInput> {
                         deviceName = "Every device"
                         deviceId = "none"
                     } else {
-                        val array = rawList[deviceSelection - 1].split("|")
-                        deviceName = array[0]
-                        deviceId = array[1]
+                        val array = rawList[deviceSelection - 1]
+                        deviceName = array.device_name
+                        deviceId = array.device_id
                     }
                     EventTriggerHelper(this).finishForTasker()
                 }

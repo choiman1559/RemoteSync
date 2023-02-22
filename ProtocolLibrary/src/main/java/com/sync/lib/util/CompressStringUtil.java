@@ -1,0 +1,85 @@
+package com.sync.lib.util;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
+
+public class CompressStringUtil {
+    private static final String CharsetName = "UTF-8";
+
+    /**
+     * compress string using DeflaterOutputStream
+     *
+     * @param string String to compress
+     * @return compressed output
+     */
+    public synchronized static String compressString(String string) {
+        return byteToString(compress(string));
+    }
+
+    /**
+     * decompress string using InflaterOutputStream
+     *
+     * @param compressed String to decompress
+     * @return decompressed output
+     */
+    public synchronized static String decompressString(String compressed) {
+        return decompress(hexToByteArray(compressed));
+    }
+
+    private static String byteToString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            for (byte b : bytes) {
+                sb.append(String.format("%02X", b));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return sb.toString();
+    }
+
+    private static byte[] compress(String text) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            OutputStream out = new DeflaterOutputStream(baos);
+            out.write(text.getBytes(CharsetName));
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return baos.toByteArray();
+    }
+
+    private static String decompress(byte[] bytes) {
+        InputStream in = new InflaterInputStream(new ByteArrayInputStream(bytes));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = in.read(buffer)) > 0) baos.write(buffer, 0, len);
+            return baos.toString(CharsetName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new AssertionError(e);
+        }
+    }
+
+    private static byte[] hexToByteArray(String hex) {
+        if (hex == null || hex.length() % 2 != 0) {
+            return new byte[]{};
+        }
+        byte[] bytes = new byte[hex.length() / 2];
+        for (int i = 0; i < hex.length(); i += 2) {
+            byte value = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
+            bytes[(int) Math.floor(i / 2)] = value;
+        }
+        return bytes;
+    }
+}

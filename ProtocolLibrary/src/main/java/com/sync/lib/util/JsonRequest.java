@@ -1,0 +1,51 @@
+package com.sync.lib.util;
+
+import android.annotation.SuppressLint;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.sync.lib.Protocol;
+
+public class JsonRequest {
+    @SuppressLint("StaticFieldLeak")
+    private static JsonRequest instance;
+    private RequestQueue requestQueue;
+
+    JsonRequest() {
+        requestQueue = getRequestQueue();
+    }
+
+    /**
+     * initialize class if instance is not available, then return instance
+     *
+     * @return A JsonRequest instance.
+     */
+    public static synchronized JsonRequest getInstance() {
+        if (instance == null) {
+            instance = new JsonRequest();
+        }
+        return instance;
+    }
+
+    /**
+     * Creates a default instance of the worker pool and calls RequestQueue.start() on it.
+     *
+     * @return A started RequestQueue instance.
+     */
+    protected RequestQueue getRequestQueue() {
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(Protocol.getInstance().applicationContext);
+        }
+        return requestQueue;
+    }
+
+    /**
+     * Adds a Request to the dispatch queue.
+     * @param req Json request instance to query
+     * @param <T> object type
+     */
+    public <T> void addToRequestQueue(Request<T> req) {
+        getRequestQueue().add(req);
+    }
+}

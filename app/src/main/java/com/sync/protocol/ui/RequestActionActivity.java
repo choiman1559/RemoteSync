@@ -2,9 +2,9 @@ package com.sync.protocol.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,9 +12,10 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.task.RequestTask;
+import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.DataProcess;
-import com.sync.protocol.ui.ToastHelper;
 
 import java.util.Objects;
 
@@ -33,6 +34,7 @@ public class RequestActionActivity extends AppCompatActivity {
 
         String Device_name = intent.getStringExtra("device_name");
         String Device_id = intent.getStringExtra("device_id");
+        PairDeviceInfo Device_info = new PairDeviceInfo(Device_name, Device_id);
         deviceName.setText(Device_name);
 
         taskArgs0.setVisibility(View.GONE);
@@ -87,15 +89,24 @@ public class RequestActionActivity extends AppCompatActivity {
             } else if (taskArgs1.getVisibility() == View.VISIBLE && taskArgs1.getText() == null) {
                 taskArgs1.setError("Please type argument");
             } else {
+                RequestTask task;
                 if (taskArgs0.getVisibility() == View.VISIBLE && taskArgs1.getVisibility() == View.VISIBLE) {
-                    DataProcess.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
+                    task = DataUtils.requestAction(Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString(), Objects.requireNonNull(taskArgs1.getText()).toString());
                 } else if (taskArgs0.getVisibility() == View.VISIBLE) {
-                    DataProcess.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
+                    task = DataUtils.requestAction(Device_info, taskSelectSpinner.getText().toString(), Objects.requireNonNull(taskArgs0.getText()).toString());
                 } else {
-                    DataProcess.requestAction(this, Device_name, Device_id, taskSelectSpinner.getText().toString());
+                    task = DataUtils.requestAction(Device_info, taskSelectSpinner.getText().toString());
                 }
 
-                ToastHelper.show(this, "Your request is posted!", "OK", ToastHelper.LENGTH_SHORT);
+                task.setOnSuccessListener(response -> {
+                    Log.d("TAG", response.toString());
+                    ToastHelper.show(this, "Your request is posted!", "OK", ToastHelper.LENGTH_SHORT);
+                });
+                task.setOnErrorListener(error -> {
+                    error.printStackTrace();
+                    ToastHelper.show(this, "Failed to send Notification! Please check internet and try again!", ToastHelper.LENGTH_SHORT);
+                });
+
                 finish();
             }
         });

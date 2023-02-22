@@ -3,7 +3,6 @@ package com.sync.protocol.ui;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -28,16 +27,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sync.lib.Protocol;
+import com.sync.lib.data.PairDeviceInfo;
+import com.sync.lib.util.DataUtils;
 import com.sync.protocol.R;
-import com.sync.protocol.service.pair.DataProcess;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ShareDataActivity extends AppCompatActivity {
@@ -64,18 +63,17 @@ public class ShareDataActivity extends AppCompatActivity {
         fileTooBigWarning.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         AtomicInteger deviceSelection = new AtomicInteger();
-        SharedPreferences pairPrefs = getSharedPreferences("com.sync.protocol_pair", MODE_PRIVATE);
         ArrayList<String> nameList = new ArrayList<>();
-        ArrayList<String> rawList = new ArrayList<>(pairPrefs.getStringSet("paired_list", new HashSet<>()));
-        for (String str : rawList) {
-            nameList.add(str.split("\\|")[0]);
+        ArrayList<PairDeviceInfo> rawList = Protocol.getInstance().getPairedDeviceList();
+        for (PairDeviceInfo device : rawList) {
+            nameList.add(device.getDevice_name());
         }
         deviceSelectSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, nameList));
         deviceSelectSpinner.setOnItemClickListener((parent, view, position, id) -> deviceSelection.set(position));
 
         String type = intent.getType();
-        if(Intent.ACTION_SEND.equals(intent.getAction()) && type != null) {
-            if(type.startsWith("text") && intent.hasExtra(Intent.EXTRA_TEXT)) {
+        if (Intent.ACTION_SEND.equals(intent.getAction()) && type != null) {
+            if (type.startsWith("text") && intent.hasExtra(Intent.EXTRA_TEXT)) {
                 String data = intent.getStringExtra(Intent.EXTRA_TEXT);
                 ArrayList<String> taskList = new ArrayList<>();
                 taskList.add("Open link in Browser");
@@ -92,14 +90,13 @@ public class ShareDataActivity extends AppCompatActivity {
                     } else if (taskSelectSpinner.getText().toString().isEmpty()) {
                         deviceSelectSpinner.setError("Please select action to execute");
                     } else {
-                        String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                        DataProcess.requestAction(this, array[0], array[1], taskSelectSpinner.getText().toString(), data);
+                        DataUtils.requestAction(rawList.get(deviceSelection.get()), taskSelectSpinner.getText().toString(), data);
                         dialog.dismiss();
                     }
                 });
-            } else if(intent.hasExtra(Intent.EXTRA_STREAM)) {
+            } else if (intent.hasExtra(Intent.EXTRA_STREAM)) {
                 Uri dataUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-                if(dataUri != null) {
+                if (dataUri != null) {
                     title.setText("Send file to another device");
                     taskSelectSpinnerLayout.setVisibility(View.GONE);
                     taskSelectSpinner.setVisibility(View.GONE);
@@ -118,7 +115,7 @@ public class ShareDataActivity extends AppCompatActivity {
                     long size = returnCursor2.getLong(sizeIndex);
                     returnCursor2.close();
 
-                    if(size > 104857600) {
+                    if (size > 3221225472L) {
                         fileTooBigWarning.setVisibility(View.VISIBLE);
                         ok.setEnabled(false);
                     }
@@ -135,7 +132,7 @@ public class ShareDataActivity extends AppCompatActivity {
                             title.setText("Uploading file...");
 
                             FirebaseStorage storage = FirebaseStorage.getInstance();
-                            StorageReference storageRef = storage.getReferenceFromUrl("gs://notisender-41c1b.appspot.com");
+                            StorageReference storageRef = storage.getReference();
                             StorageReference fileRef = storageRef.child(getSharedPreferences("com.sync.protocol_preferences", MODE_PRIVATE).getString("UID", "") + "/" + name);
                             StorageMetadata metadata = new StorageMetadata.Builder().setContentType(type).build();
                             UploadTask uploadTask = fileRef.putFile(dataUri, metadata);
@@ -155,8 +152,7 @@ public class ShareDataActivity extends AppCompatActivity {
                                 completeDialog.setPositiveButton("Close", (dialogInterface, i) -> finish());
                                 completeDialog.show();
 
-                                String[] array = rawList.get(deviceSelection.get()).split("\\|");
-                                DataProcess.requestAction(this, array[0], array[1], "Share file", name);
+                                DataUtils.requestAction(rawList.get(deviceSelection.get()), "Share file", name);
                             });
 
                             uploadTask.addOnProgressListener(snapshot -> {
@@ -185,7 +181,7 @@ public class ShareDataActivity extends AppCompatActivity {
         }
 
         dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().setGravity(Gravity.BOTTOM);
         dialog.setOnDismissListener(dialog1 -> finish());

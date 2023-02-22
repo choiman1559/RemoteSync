@@ -1,2 +1,3 @@
 rootProject.name = "SyncProtocol"
 include ':app'
+include ':ProtocolLibrary'

@@ -24,11 +24,15 @@ public class PowerUtils {
         return wakeLock != null && wakeLock.isHeld();
     }
 
-    public void acquire() {
+    public void acquire(long timeout) {
         if (!isHeld()) {
-            //10 minutes timeout for battery save
-            wakeLock.acquire(10 * 60 * 1000L);
+            wakeLock.acquire(timeout);
         }
+    }
+
+    public void acquire() {
+        //10 minutes timeout for battery save
+        acquire(10 * 60 * 1000L);
     }
 
     public void release() {
